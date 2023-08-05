@@ -17,6 +17,7 @@ struct trobj {
     uchar elemental_enchantment;
     uchar exceptionality;
     uchar material;
+    int oartifact;
 };
 
 STATIC_DCL void FDECL(ini_inv, (const struct trobj *));
@@ -325,6 +326,13 @@ STATIC_VAR const struct trobj WandOfProbing[] = { { WAN_PROBING, 0, WAND_CLASS, 
                                     { 0, 0, 0, 0, 0, 0, 0, 0, MAT_NONE } };
 STATIC_VAR const struct trobj ScrollOfRemoveCurse[] = { { SCR_REMOVE_CURSE, 0, SCROLL_CLASS, 1, 0, 0, 0, 0, MAT_NONE },
                                     { 0, 0, 0, 0, 0, 0, 0, 0, MAT_NONE } };
+
+STATIC_VAR const struct trobj SpeechTherapyGame[] = {
+    //{ DEAD_DEMON_IN_A_CAGE, 0, TOOL_CLASS, 1, 0, 0, 0, 0, MAT_NONE },
+    { DEAD_DEMON_IN_A_CAGE, 0, TOOL_CLASS, 1, 0, 0, 0, 0, MAT_NONE, ART_CAGED_DEMON_CALLED_LOGON_THE_GUIDE },
+};
+
+
 
 /* race-based substitutions for initial inventory;
    the weaker cloak for elven rangers is intentional--they shoot better */
@@ -983,6 +991,8 @@ u_init()
     u.nv_range = 1;
     u.xray_range = -1;
 
+    ini_inv(SpeechTherapyGame); // Add SpeechTherapyGame items to the starting inventory.
+
     /*** Role-specific initializations ***/
     switch (Role_switch) {
     /* rn2(100) > 50 necessary for some choices because some
@@ -1092,6 +1102,7 @@ u_init()
          * avoid playing priests and/or confirm another player's
          * role in their YAAP.
          */
+
         break;
     case PM_RANGER:
     {
@@ -2072,6 +2083,15 @@ register const struct trobj * trop;
                 initialspell(obj);
                 useup(obj);
             }
+
+            // If the trop specifies an artifact...
+        	if (trop->oartifact > 0) {
+                // Convert the object into an Artifact.
+                obj = oname(obj, artilist[trop->oartifact].name);
+                // Identify the Artifact.
+                fully_identify_obj(obj);
+            }
+
             quan--; /* make a similar object */
         }
         trop++;

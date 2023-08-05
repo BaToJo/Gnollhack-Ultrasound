@@ -13,7 +13,7 @@ STATIC_DCL int FDECL(use_cubic_gate, (struct obj*));
 STATIC_DCL int FDECL(use_camera, (struct obj *));
 STATIC_DCL int FDECL(use_towel, (struct obj *));
 STATIC_DCL boolean FDECL(its_dead, (int, int, int *));
-STATIC_DCL int FDECL(use_stethoscope, (struct obj *));
+STATIC_DCL int FDECL(use_speechTherapyGame_Guide, (struct obj*));
 STATIC_DCL void FDECL(use_whistle, (struct obj *));
 STATIC_DCL int FDECL(use_leash, (struct obj *));
 STATIC_DCL int FDECL(use_mirror, (struct obj *));
@@ -770,6 +770,17 @@ register struct obj *obj;
     if (!its_dead(rx, ry, &res))
         You("hear nothing special."); /* not You_hear()  */
     return res;
+}
+
+/* This method is the entry point for the player to interact with the speech therapy gamification interface. It is called by the player Applying the speech therapy guide item: a caged demon called Logon. */
+STATIC_OVL int
+use_speechTherapyGame_Guide(obj)
+register struct obj* obj;
+{
+    // This currently is a placeholder. TODO SpeechTherapyGame.
+
+    You("pet the bug-eyed demon.");
+    return;
 }
 
 STATIC_VAR const char whistle_str[] = "produce a %s whistling sound.";
@@ -5925,6 +5936,10 @@ doapply()
             break;
         case STETHOSCOPE:
             res = use_stethoscope(obj);
+            break;
+        case DEAD_DEMON_IN_A_CAGE:
+        case ART_CAGED_DEMON_CALLED_LOGON_THE_GUIDE:
+            res = use_speechTherapyGame_Guide(obj);
             break;
         case MIRROR:
         case MAGIC_MIRROR:
