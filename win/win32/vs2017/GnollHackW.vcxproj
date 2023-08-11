@@ -296,6 +296,7 @@
     <ClInclude Include="$(IncDir)wintype.h" />
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
+    <ClInclude Include="$(IncDir)speech_therapy_game.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="$(WinWin32Dir)GnollHackNew.ico" />
