@@ -554,6 +554,10 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     SendMessage(GetNHApp()->hPopupWnd, WM_COMMAND, IDCANCEL,
                                 0);
 
+
+                // If the speechTherapyGame has talked to AAA via pipe, we should let AAA know that we're exiting on this side.
+                speechTherapyGame_closePipe();
+
                 /* tell GnollHack core that "hangup" is requested */
                 hangup(1);
 #else
@@ -562,6 +566,9 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
                 break;
             case IDNO:
+            	// If the speechTherapyGame has talked to AAA via pipe, we should let AAA know that we're exiting on this side.
+                speechTherapyGame_closePipe();
+
                 NHEVENT_KBD('q');
                 done(QUIT);
                 break;

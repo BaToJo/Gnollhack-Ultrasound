@@ -24,14 +24,14 @@ static NamedPipe* instance = NULL;
 NamedPipe* speechTherapyGame_getPipe() {
     // If the pipe struct has not been instantiated yet, create it.
     if (instance == NULL) {
-        You("see there is no pipe instance, so you create one.");
+        // You("see there is no pipe instance, so you create one.");
         instance = (NamedPipe*)malloc(sizeof(NamedPipe));
         instance->isConnected = false;
     }
     // If the pipe has not been connected yet, connect it.
     if (!instance->isConnected)
     {
-        You("see the pipe is not connected, so you try to connect to it.");
+        // You("see the pipe is not connected, so you try to connect to it.");
         instance->pipeHandle = CreateFile(
             PIPE_NAME,
             GENERIC_READ | GENERIC_WRITE,
@@ -50,7 +50,7 @@ NamedPipe* speechTherapyGame_getPipe() {
         } else
         {
             instance->isConnected = true;
-            You("successfully connect to the pipe.");
+            // You("successfully connect to the pipe.");
         }
     }
     return instance;
@@ -59,7 +59,7 @@ NamedPipe* speechTherapyGame_getPipe() {
 bool speechTherapyGame_sendString(const char* message) {
     if (speechTherapyGame_getPipe() != NULL)
     {
-        You("try to write to the pipe...");
+        // You("try to write to the pipe...");
         DWORD bytesWritten;
         bool result = WriteFile(
             speechTherapyGame_getPipe()->pipeHandle,
@@ -71,7 +71,7 @@ bool speechTherapyGame_sendString(const char* message) {
         auto error = GetLastError();
         if (result == true)
         {
-            You("successfully write to the pipe.");
+            // You("successfully write to the pipe.");
         }
         else
         {
@@ -85,7 +85,7 @@ bool speechTherapyGame_sendString(const char* message) {
 bool speechTherapyGame_receiveString(char* buffer, DWORD bufferSize) {
     if (speechTherapyGame_getPipe() != NULL)
     {
-        You("try to read from the pipe...");
+        // You("try to read from the pipe...");
         DWORD bytesRead;
         BOOL result = ReadFile(
             speechTherapyGame_getPipe()->pipeHandle,
@@ -97,7 +97,7 @@ bool speechTherapyGame_receiveString(char* buffer, DWORD bufferSize) {
         auto error = GetLastError();
         if (result == true)
         {
-            You("successfully read from the pipe.");
+            // You("successfully read from the pipe.");
         }
         else
         {
@@ -111,7 +111,7 @@ bool speechTherapyGame_receiveString(char* buffer, DWORD bufferSize) {
 bool speechTherapyGame_sendByte(const MESSAGE_TYPE byte) {
     if (speechTherapyGame_getPipe() != NULL)
     {
-        You("try to write to the pipe...");
+        //You("try to write to the pipe...");
         DWORD bytesWritten;
         bool result = WriteFile(
             speechTherapyGame_getPipe()->pipeHandle,
@@ -123,7 +123,7 @@ bool speechTherapyGame_sendByte(const MESSAGE_TYPE byte) {
         auto error = GetLastError();
         if (result == true)
         {
-            You("successfully write to the pipe.");
+            //You("successfully write to the pipe.");
         }
         else
         {
@@ -137,7 +137,7 @@ bool speechTherapyGame_sendByte(const MESSAGE_TYPE byte) {
 bool speechTherapyGame_receiveByte(MESSAGE_TYPE* byte) {
     if (speechTherapyGame_getPipe() != NULL)
     {
-        You("try to read from the pipe...");
+        //You("try to read from the pipe...");
         DWORD bytesRead;
         BOOL result = ReadFile(
             speechTherapyGame_getPipe()->pipeHandle,
@@ -149,7 +149,7 @@ bool speechTherapyGame_receiveByte(MESSAGE_TYPE* byte) {
         auto error = GetLastError();
         if (result == true)
         {
-            You("successfully read from the pipe.");
+            //You("successfully read from the pipe.");
         }
         else
         {
@@ -161,15 +161,16 @@ bool speechTherapyGame_receiveByte(MESSAGE_TYPE* byte) {
 }
 
 void speechTherapyGame_closePipe() {
-    You("try to close the pipe...");
+    // You("try to close the pipe...");
     if (instance != NULL) {
         if (instance->isConnected) {
+            speechTherapyGame_sendString("C"); // This is the shutdown signal we send to AAA to declare we are closing on this end.
             CloseHandle(instance->pipeHandle);
             instance->isConnected = FALSE;
         }
         free(instance);
         instance = NULL;
-        You("successfully close the pipe.");
+        // You("successfully close the pipe.");
     } else
     {
         You("find that the pipe is already closed! Why?");
