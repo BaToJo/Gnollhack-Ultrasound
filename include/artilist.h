@@ -491,7 +491,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL, CRYSTAL_BALL,
     NO_ATTK,                      // Attack
     NO_POWER,                     // Passive feature granted when worn/wielded
     NO_POWER,                     // Passive feature granted when carried in your inventory
-    ARTINVOKE_TAMING,             // Invocation (TODO ultrasound: Should this be where code to do ultrasound goes?)
+    ARTINVOKE_SPEECHTHERAPYGAME,  // Invocation (TODO ultrasound: Should this be where code to do ultrasound goes?)
     0,                            // Invocation duration (number of dice)
     0,                            // Invocation duration (die size)
     0,                            // Invocation duration (mod, eg. +4)
@@ -503,7 +503,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL, CRYSTAL_BALL,
     0L,                           // Cost (gold?)
     NO_COLOR,                     // Glow color
     CLR_BLACK,                    // Object color
-    24,                           // Height
+    48,                           // Height
     OBJECT_SOUNDSET_NONE          // Soundset
         ),
 

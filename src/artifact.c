@@ -7,6 +7,7 @@
 
 #include "hack.h"
 #include "artilist.h"
+#include "speech_therapy_game.h"
 
 /*
  * Note:  both artilist[] and artiexist[] have a dummy element #0,
@@ -25,7 +26,7 @@ STATIC_VAR boolean touch_blasted; /* for retouch_object() */
 const char* artifact_invoke_names[NUM_ARTINVOKES] = {
     "taming", "healing", "mana replenishment", "untrapping", "charging",
     "level teleportation", "portal creation", "enlightenment", "arrow creation", "arrow of Diana", "death ray", "blessing of contents", "wishing",
-    "summon demon", "summon elder air elemental", "recharge itself", "activates the artifact", "time stop", "bolt of cold, lightning or fire"
+    "summon demon", "summon elder air elemental", "recharge itself", "activates the artifact", "power word challenge"/* SpeechTherapyGame */, "time stop", "bolt of cold, lightning or fire"
 };
 
 #define get_artifact(o) \
@@ -2997,6 +2998,31 @@ struct obj *obj;
 
             pline("As you invoke %s, a surge of power surronds %s." , the(cxname(obj)), the(artifact_hit_desc));
             obj->invokeleft = duration;
+            break;
+        }
+        case ARTINVOKE_SPEECHTHERAPYGAME:
+        {
+            unsigned char message[BUFFER_SIZE];
+
+            // You can send any of the following messages to AAA:
+            // T  - Send me a test response.
+            // C  - Close your pipe handler.
+            if (speechTherapyGame_sendString("T")) {
+                You("request a test response from AAA.");
+
+                if (speechTherapyGame_receiveByte(message)) {
+                    You("hear AAA reply: %d", message[0]);
+                    play_simple_object_sound(obj, OBJECT_SOUND_TYPE_INVOKE);
+                }
+                else {
+                    You("fail to receive a response from AAA.");
+                    play_simple_object_sound(obj, OBJECT_SOUND_TYPE_TAKE_OFF);
+                }
+            }
+            else {
+                You("fail to send a message on the pipe.");
+                play_simple_object_sound(obj, OBJECT_SOUND_TYPE_TAKE_OFF);
+            }
             break;
         }
 

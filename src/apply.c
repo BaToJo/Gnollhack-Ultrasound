@@ -6,7 +6,7 @@
 /* GnollHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "speech_therapy_game.h"
+//#include "speech_therapy_game.h"
 
 extern boolean notonhead; /* for long worms */
 
@@ -780,25 +780,7 @@ register struct obj* obj;
 {
     // This currently is a placeholder. TODO SpeechTherapyGame.
 
-	// char buffer[BUFFER_SIZE];
-    unsigned char message[BUFFER_SIZE];
-
-    // You can send any of the following messages to AAA:
-    // T  - Send me a test response.
-    // C  - Close your pipe handler.
-    if (speechTherapyGame_sendString("T")) {
-        You("request a test response from AAA.");
-
-    	if (speechTherapyGame_receiveByte(message)) {
-            You("hear AAA reply: %d", message[0]);
-        }
-        else {
-            You("fail to receive a response from AAA.");
-        }
-    }
-    else {
-        You("fail to send a message on the pipe.");
-    }
+    You("pet the demon.");
 
     return 0;
 }

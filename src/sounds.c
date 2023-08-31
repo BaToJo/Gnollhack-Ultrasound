@@ -26,6 +26,7 @@ STATIC_DCL void FDECL(hermit_talk_with_startindex, (struct monst*, const char**,
 STATIC_DCL void FDECL(popup_talk, (struct monst*, const char**, enum ghsound_types, int, int, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(popup_talk_core, (struct monst*, const char**, enum ghsound_types, UCHAR_P, int, int, int, BOOLEAN_P, BOOLEAN_P));
 
+STATIC_DCL int FDECL(do_chat_speechtherapygame_intro, (struct monst*));
 STATIC_DCL int FDECL(do_chat_hermit_dungeons, (struct monst*));
 STATIC_DCL int FDECL(do_chat_hermit_quests, (struct monst*));
 STATIC_DCL int FDECL(do_chat_hermit_gnomish_mines, (struct monst*));
@@ -2537,6 +2538,20 @@ struct monst* mtmp;
 
         if (is_speaking(mtmp->data) && is_peaceful(mtmp) && has_enpc(mtmp) && (npc_subtype_definitions[ENPC(mtmp)->npc_typ].service_flags & NPC_SERVICE_GIVE_STARTING_QUESTS) != 0)
         {
+            /* Hermit - Speech Therapy Game introductory information */
+        	Strcpy(available_chat_list[chatnum].name, "Ask about the power of speech");
+            available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_intro;
+            available_chat_list[chatnum].charnum = 'a' + chatnum;
+
+            any = zeroany;
+            any.a_char = available_chat_list[chatnum].charnum;
+
+            add_menu(win, NO_GLYPH, &any,
+                any.a_char, 0, ATR_NONE, NO_COLOR,
+                available_chat_list[chatnum].name, MENU_UNSELECTED);
+
+            chatnum++;
+
             /* Hermit - Starting Quests */
             Strcpy(available_chat_list[chatnum].name, "Ask about the Dungeons of Doom");
             available_chat_list[chatnum].function_ptr = &do_chat_hermit_dungeons;
@@ -9590,6 +9605,32 @@ struct monst* mtmp;
     return 1;
 }
 
+
+STATIC_OVL int
+do_chat_speechtherapygame_intro(mtmp)
+struct monst* mtmp;
+{
+    if (!mtmp || !m_speak_check(mtmp))
+        return 0;
+
+    const char* linearray[11] = {
+        /* ---------------- Lines should be no longer than this ---------------- */
+        "You have entered these Dungeons of Doom with the ability to speak.",
+        "Many creatures you may meet within these dungeons can speak too.",
+        "They may be worth talking to, as they can offer advice and even friendship on your adventure.",
+        "However you wield a special power that they don't.",
+        "You are carrying a unique creature in a cage. He is a rare and ancient demon, bound to serve his keeper.",
+        "He is your broker to ancient and powerful magic that can be unleashed only by speaking special words.",
+        "Use this demon on your adventure, and he will give you speech challenges.",
+        "Each one that you can speak clearly and correctly will call upon ancient power for you to use.",
+        "Nothing limits you, and there is no punishment for failing these.",
+        "So use your power, seek challenge and adventure, and find the Amulet of Yendor!",
+        0 };
+
+    hermit_talk(mtmp, linearray, GHSOUND_NONE);
+    mtmp->hermit_told_dungeon = 1;
+    return 1;
+}
 
 STATIC_OVL int 
 do_chat_hermit_dungeons(mtmp)
