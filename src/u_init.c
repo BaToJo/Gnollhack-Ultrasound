@@ -328,8 +328,8 @@ STATIC_VAR const struct trobj ScrollOfRemoveCurse[] = { { SCR_REMOVE_CURSE, 0, S
                                     { 0, 0, 0, 0, 0, 0, 0, 0, MAT_NONE } };
 
 STATIC_VAR const struct trobj SpeechTherapyGame[] = {
-    //{ DEAD_DEMON_IN_A_CAGE, 0, TOOL_CLASS, 1, 0, 0, 0, 0, MAT_NONE },
-    { DEAD_DEMON_IN_A_CAGE, 0, TOOL_CLASS, 1, 0, 0, 0, 0, MAT_NONE, ART_CAGED_DEMON_CALLED_LOGON_THE_GUIDE },
+    { CAGED_SPEECH_DEMON, 0, TOOL_CLASS, 1, 0, 0, 0, 0, MAT_NONE },
+    // { CAGED_SPEECH_DEMON, 0, TOOL_CLASS, 1, 0, 0, 0, 0, MAT_NONE, ART_CAGED_DEMON_CALLED_LOGON_THE_GUIDE },
 };
 
 
@@ -992,6 +992,7 @@ u_init()
     u.xray_range = -1;
 
     ini_inv(SpeechTherapyGame); // Add SpeechTherapyGame items to the starting inventory.
+    objects[CAGED_SPEECH_DEMON].oc_name_known = 0; // Ensure the player starts with Logon unidentified.
 
     /*** Role-specific initializations ***/
     switch (Role_switch) {

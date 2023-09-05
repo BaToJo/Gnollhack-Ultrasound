@@ -778,9 +778,12 @@ STATIC_OVL int
 use_speechTherapyGame_Guide(obj)
 register struct obj* obj;
 {
-    // This currently is a placeholder. TODO SpeechTherapyGame.
+    You("look into the cage, and the demon meets your gaze...\n");
 
-    You("pet the demon.");
+    /* Give the player conversation options with Logon, as if talking to an NPC.
+     * This is the interface the player gets to ask for information and make choices about their challenge rewards.
+     */
+    dochatmon(&youmonst);
 
     return 0;
 }
@@ -5939,7 +5942,7 @@ doapply()
         case STETHOSCOPE:
             res = use_stethoscope(obj);
             break;
-        case DEAD_DEMON_IN_A_CAGE:
+        case CAGED_SPEECH_DEMON:
         case ART_CAGED_DEMON_CALLED_LOGON_THE_GUIDE:
             res = use_speechTherapyGame_Guide(obj);
             break;

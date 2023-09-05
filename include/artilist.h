@@ -474,8 +474,8 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL, CRYSTAL_BALL,
     "caged demon called Logon the Guide",   // Identified name
     "tiny demon in a cage",       // Unidentified name
     "caged demon",                // Description of item when it hits "the X hits for 10 damage"
-    DEAD_DEMON_IN_A_CAGE,         // Item type
-    DEAD_DEMON_IN_A_CAGE,         // Mask type
+    CAGED_SPEECH_DEMON,         // Item type
+    CAGED_SPEECH_DEMON,         // Mask type
     MAT_NONE,                     // Material
     EXCEPTIONALITY_NORMAL,        // Exceptionality
     MYTHIC_PREFIX_NONE,           // Mythic Prefix
@@ -483,7 +483,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL, CRYSTAL_BALL,
     (AF_NOGEN | AF_RESTR | AF_INTEL | AF_SPEAK | AF_NAME_KNOWN_WHEN_INVOKED /*| AF_NO_WISH*/), // Flags
     (AF2_INDESTRUCTIBLE | AF2_NAME_IS_PROPER_NAME), // Flags 2
     SPFX_NONE,                    // Passive effects when worn or wielded
-    SPFX_UNLUCK,                  // Passive effects when carried in your inventory
+    SPFX_NONE /*SPFX_UNLUCK*/,   // Passive effects when carried in your inventory
     0,                            // Type of monster that this Artifact has a special interaction with
     0,                            // To-hit number of dice
     0,                            // To-hit die size
@@ -496,13 +496,13 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL, CRYSTAL_BALL,
     0,                            // Invocation duration (die size)
     0,                            // Invocation duration (mod, eg. +4)
     0,                            // Mana cost
-    1,                            // Cooldown until it repowers
+    3,                            // Cooldown until it repowers
     A_NONE,                       // Alignment
     NON_PM,                       // Class restriction
     NON_PM,                       // Racial restriction
     0L,                           // Cost (gold?)
-    NO_COLOR,                     // Glow color
-    CLR_BLACK,                    // Object color
+    CLR_BLACK,                    // Glow color
+    CLR_RED,                      // Object color
     48,                           // Height
     OBJECT_SOUNDSET_NONE          // Soundset
         ),

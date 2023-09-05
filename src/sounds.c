@@ -77,6 +77,16 @@ STATIC_DCL int FDECL(do_chat_quantum_special_wand, (struct monst*));
 STATIC_DCL int FDECL(do_chat_quantum_disintegration_wand, (struct monst*));
 STATIC_DCL int FDECL(do_chat_quantum_teleportation_wand, (struct monst*));
 
+/* SpeechTherapyGame chat behaviours */
+#define speechtherapygame_logon_told_info special_talk_flag1
+#define speechtherapygame_logon_told_choose_power special_talk_flag2
+STATIC_DCL int FDECL(do_chat_speechtherapygame_info, (struct monst*));
+STATIC_DCL int FDECL(do_chat_speechtherapygame_choose_power, (struct monst*));
+STATIC_DCL int FDECL(do_chat_speechtherapygame_power_taming, (struct monst*));
+STATIC_DCL int FDECL(do_chat_speechtherapygame_power_polymorph, (struct monst*));
+STATIC_DCL int FDECL(do_chat_speechtherapygame_power_teleport, (struct monst*));
+
+
 #define quantum_told_experiments special_talk_flag1
 
 STATIC_DCL int FDECL(do_chat_pet_sit, (struct monst*));
@@ -2283,6 +2293,14 @@ struct monst* mtmp;
 {
     boolean elbereth_was_known = (boolean)u.uevent.elbereth_known;
 
+    if (mtmp == &youmonst /* We use this to signify that the player is talking to an item in their inventory. */)
+    {
+        // You("talk to an item. (TEST)");
+        
+    } else
+    { /* Regular chat behaviour below, SpeechTherapyGame chat behaviour above. */
+		    
+
     if (!mtmp || 
         ((!canspotmon(mtmp) || mtmp->mundetected || M_AP_TYPE(mtmp) == M_AP_FURNITURE || M_AP_TYPE(mtmp) == M_AP_OBJECT) && !is_tame(mtmp)))
     {
@@ -2339,6 +2357,7 @@ struct monst* mtmp;
         pline("%s is eating noisily.", Monnam(mtmp));
         return 0;
     }
+    } /* End of SpeechTherapyGame if/else */
 
     /* Finally, generate the actual chat menu */
     struct permonst* ptr = mtmp->data;
@@ -2395,6 +2414,8 @@ struct monst* mtmp;
 
         any = zeroany;
 
+        if (mtmp != &youmonst /* We use this to signify that the player is talking to an item in their inventory. */)
+        {
         /* Hello! This is the old chat, i.e., domonnoise function */
         Strcpy(available_chat_list[chatnum].name, "\"Hello there!\"");
         available_chat_list[chatnum].function_ptr = &domonnoise_with_popup;
@@ -2408,6 +2429,7 @@ struct monst* mtmp;
             available_chat_list[chatnum].name, MENU_UNSELECTED);
 
         chatnum++;
+        }
 
         if (is_speaking(mtmp->data) && is_mon_talkative(mtmp))
         {
@@ -2427,6 +2449,101 @@ struct monst* mtmp;
         }
 
         boolean non_advicing_npc = has_enpc(mtmp) && (npc_subtype_definitions[ENPC(mtmp)->npc_typ].general_flags & NPC_FLAGS_NO_ADVICE) != 0;
+
+        /* SpeechTherapyGame chat options for talking to Logon the Guide item in the player's inventory */
+        if (mtmp == &youmonst /* We use this to signify that the player is talking to an item in their inventory. */)
+        {
+	        if (carrying(CAGED_SPEECH_DEMON)) /* The base item type of Logon the Guide */
+	        {
+                if (mtmp->speechtherapygame_logon_told_choose_power)
+                {
+                    /* Taming Power
+                     *   Acceptable = Charm Monster Spell effect (temporary)
+                     *         Good = Dominate Monster Spell effect (permanent)
+                     *    Excellent = Mass Dominate Monster Spell effect (area, permanent)
+                     */
+                    Strcpy(available_chat_list[chatnum].name, "I can persuade anyone to be my friend");
+                    available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_power_taming;
+                    available_chat_list[chatnum].charnum = 'a' + chatnum;
+                    any = zeroany;
+                    any.a_char = available_chat_list[chatnum].charnum;
+                    add_menu(win, NO_GLYPH, &any,
+                        any.a_char, 0, ATR_NONE, NO_COLOR,
+                        available_chat_list[chatnum].name, MENU_UNSELECTED);
+                    chatnum++;
+
+                    /* Controlled Polymorph Power
+                     *   Acceptable = 50d4 turns
+                     *         Good = 400d2 turns
+                     *    Excellent = 1000d8 turns
+                     */
+                    Strcpy(available_chat_list[chatnum].name, "I can become anyone I want to be");
+                    available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_power_polymorph;
+                    available_chat_list[chatnum].charnum = 'a' + chatnum;
+                    any = zeroany;
+                    any.a_char = available_chat_list[chatnum].charnum;
+                    add_menu(win, NO_GLYPH, &any,
+                        any.a_char, 0, ATR_NONE, NO_COLOR,
+                        available_chat_list[chatnum].name, MENU_UNSELECTED);
+                    chatnum++;
+
+                    /* Controlled Teleport Power
+                     *   Acceptable = Teleport randomly
+                     *         Good = Teleport to target
+                     *    Excellent = Level Teleport to target
+                     */
+                    Strcpy(available_chat_list[chatnum].name, "I can go anywhere I want to");
+                    available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_power_teleport;
+                    available_chat_list[chatnum].charnum = 'a' + chatnum;
+                    any = zeroany;
+                    any.a_char = available_chat_list[chatnum].charnum;
+                    add_menu(win, NO_GLYPH, &any,
+                        any.a_char, 0, ATR_NONE, NO_COLOR,
+                        available_chat_list[chatnum].name, MENU_UNSELECTED);
+                    chatnum++;
+
+                    mtmp->speechtherapygame_logon_told_choose_power = 0;
+                } else
+                {
+                    if (mtmp->speechtherapygame_logon_told_info)
+                    {
+                        Strcpy(available_chat_list[chatnum].name, "Ask how to use your speech powers");
+                    }
+                    else
+                    {
+                        Strcpy(available_chat_list[chatnum].name, "Who are you?");
+                    }
+                    available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_info;
+                    available_chat_list[chatnum].charnum = 'a' + chatnum;
+
+                    any = zeroany;
+                    any.a_char = available_chat_list[chatnum].charnum;
+
+                    add_menu(win, NO_GLYPH, &any,
+                        any.a_char, 0, ATR_NONE, NO_COLOR,
+                        available_chat_list[chatnum].name, MENU_UNSELECTED);
+
+                    chatnum++;
+
+                    if (mtmp->speechtherapygame_logon_told_info)
+                    {
+                        Strcpy(available_chat_list[chatnum].name, "Choose how your power is focused");
+                        available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_choose_power;
+                        available_chat_list[chatnum].charnum = 'a' + chatnum;
+
+                        any = zeroany;
+                        any.a_char = available_chat_list[chatnum].charnum;
+
+                        add_menu(win, NO_GLYPH, &any,
+                            any.a_char, 0, ATR_NONE, NO_COLOR,
+                            available_chat_list[chatnum].name, MENU_UNSELECTED);
+
+                        chatnum++;
+                    }
+                }
+            }
+        }
+
 
         if(is_speaking(mtmp->data) && is_peaceful(mtmp) && !non_advicing_npc)
         {
@@ -9550,6 +9667,139 @@ struct monst* mtmp;
 }
 
 
+
+STATIC_OVL int
+do_chat_speechtherapygame_info(mtmp)
+struct monst* mtmp;
+{
+    if (!mtmp || !m_speak_check(mtmp))
+        return 0;
+
+    if (mtmp->speechtherapygame_logon_told_info)
+    {
+        const char* linearray[6] = {
+            "You can call on the power of your voice whenever you want.",
+            "To do this, Invoke me and you will get a speech challenge.",
+            "Speak well, and the power of your voice will affect the world around you.",
+            "I will focus your power into whichever form you want.",
+            "You can speak to me at any time to choose how your power is focused.",
+            0 };
+
+        hermit_talk(mtmp, linearray, GHSOUND_NONE);
+    }
+    else
+    {
+        const char* linearray[9] = {
+            "I am Logon the Guide.",
+            "I am a demon of speech bound to serve you.",
+            "Your voice is a source of great power which I can focus for you.",
+            "You can call on the power of your voice whenever you want.",
+            "To do this, Invoke me and you will get a speech challenge.",
+            "Speak well, and the power of your voice will affect the world around you.",
+            "I will focus your power into whichever form you want.",
+            "You can speak to me at any time to choose how your power is focused.",
+            0 };
+
+        // Find Logon in the player's inventory.
+        struct obj* logon = carrying(CAGED_SPEECH_DEMON);
+
+        // Convert Logon into his Artifact form.
+        oname(logon, artilist[ART_CAGED_DEMON_CALLED_LOGON_THE_GUIDE].name);
+
+        // Fully identify Logon.
+        fully_identify_obj(logon);
+
+        mtmp->speechtherapygame_logon_told_info = 1;
+
+        hermit_talk(mtmp, linearray, GHSOUND_NONE);
+    }
+
+    return 1;
+}
+
+
+STATIC_OVL int
+do_chat_speechtherapygame_choose_power(mtmp)
+struct monst* mtmp;
+{
+    if (!mtmp || !m_speak_check(mtmp))
+        return 0;
+
+    // Find Logon in the player's inventory.
+    struct obj* logon = carrying(CAGED_SPEECH_DEMON);
+
+    mtmp->speechtherapygame_logon_told_choose_power = 1;
+
+    dochatmon(&youmonst); // Reopen the chat with Logon immediately.
+
+    return 1;
+}
+
+
+STATIC_OVL int
+do_chat_speechtherapygame_power_taming(mtmp)
+struct monst* mtmp;
+{
+    if (!mtmp || !m_speak_check(mtmp))
+        return 0;
+
+    const char* linearray[2] = {
+        "Your voice can command armies.",
+        0 };
+
+    // Find Logon in the player's inventory.
+    struct obj* logon = carrying(CAGED_SPEECH_DEMON);
+
+    // TODO: Put Taming power here!
+
+    hermit_talk(mtmp, linearray, GHSOUND_NONE);
+
+    return 1;
+}
+
+STATIC_OVL int
+do_chat_speechtherapygame_power_polymorph(mtmp)
+struct monst* mtmp;
+{
+    if (!mtmp || !m_speak_check(mtmp))
+        return 0;
+
+    const char* linearray[2] = {
+        "Your voice shapes your destiny.",
+        0 };
+
+    // Find Logon in the player's inventory.
+    struct obj* logon = carrying(CAGED_SPEECH_DEMON);
+
+    // TODO: Put Polymorph power here!
+
+    hermit_talk(mtmp, linearray, GHSOUND_NONE);
+
+    return 1;
+}
+
+STATIC_OVL int
+do_chat_speechtherapygame_power_teleport(mtmp)
+struct monst* mtmp;
+{
+    if (!mtmp || !m_speak_check(mtmp))
+        return 0;
+
+    const char* linearray[2] = {
+        "Your voice lays your path onward.",
+        0 };
+
+    // Find Logon in the player's inventory.
+    struct obj* logon = carrying(CAGED_SPEECH_DEMON);
+
+    // TODO: Put Teleport power here!
+
+    hermit_talk(mtmp, linearray, GHSOUND_NONE);
+
+    return 1;
+}
+
+
 STATIC_OVL int
 do_chat_quantum_special_wand(mtmp)
 struct monst* mtmp;
@@ -9628,7 +9878,6 @@ struct monst* mtmp;
         0 };
 
     hermit_talk(mtmp, linearray, GHSOUND_NONE);
-    mtmp->hermit_told_dungeon = 1;
     return 1;
 }
 

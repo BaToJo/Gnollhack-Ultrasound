@@ -2868,9 +2868,9 @@ SPELLTOOL("grail of healing", "wooden grail", "sacred wine", "red liquid", "Heal
 
 /* speechTherapyGame_Guide */
 SPELLTOOL(
-    "dead demon in a cage", // Real name
+    "caged speech demon", // Real name
     "tiny demon in a cage", // Unidentified name
-    "the tiny demon", // Real content
+    "the speech demon", // Real content
     "the tiny demon", // Unidentified content
     "Apply this to talk to Logon, or invoke it to use Logon's power.\nUsing Logon is the only way to cast powerful magic with your voice.\nDon't leave him behind!", // Description of item (on Examine)
     TOOLTYPE_GENERAL, // subtype
