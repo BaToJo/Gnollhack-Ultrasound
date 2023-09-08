@@ -408,3 +408,7 @@ ASALocalRun/
 
 !win/win32/winclisrv/GnollHackClient/GnollHackClient.Android/libs/*
 !*.json
+
+# SpeechTherapyGame
+speech_therapy_addons/*.bat
+speech_therapy_addons/*.lnk

@@ -3002,6 +3002,141 @@ struct obj *obj;
         }
         case ARTINVOKE_SPEECHTHERAPYGAME:
         {
+
+            int challenge_result = 60;
+            int challenge_threshold_perfect = 99;
+            int challenge_threshold_great = 70;
+            int challenge_threshold_adequate = 40;
+
+            int challenge_rolling_average_result = challenge_result;
+			/* We want to reward both objectively good speech production, and also reward improvement over previous results.
+			 * To do this, we can keep a weighted moving average of results and compare the current result to it.
+			 */
+
+			switch(*(&youmonst.talkstate_item_trading))
+			{
+            case 1:
+                /* Taming Power
+				 *   Acceptable = Charm Monster Spell effect (temporary)
+				 *         Good = Dominate Monster Spell effect (permanent)
+				 *    Excellent = Mass Dominate Monster Spell effect (area, permanent)
+				 */
+                You("try to tame. (TEST)");
+
+                if (challenge_result >= challenge_threshold_perfect)
+                {
+                    struct obj pseudo;
+                    pseudo = zeroobj; /* neither cursed nor blessed, zero oextra too */
+                    pseudo.otyp = SCR_TAMING;
+                    boolean effect_happened = 0;
+                    (void)seffects(&pseudo, &effect_happened, &youmonst);
+                    break;
+                }
+                else if (challenge_result >= challenge_threshold_adequate)
+                { // Perfect or Great
+                    struct obj pseudo = zeroobj;
+                    if (challenge_result >= challenge_threshold_great)
+                    {
+                        // Permanent tame.
+                        pseudo.otyp = SPE_DOMINATE_MONSTER;
+                    } else
+                    {
+                        // Temporary charm.
+                        pseudo.otyp = SPE_CHARM_MONSTER;
+                    }
+                    pseudo.quan = 20L; /* do not let useup get it */
+                    double damage = 0;
+
+                    if (!getdir((char*)0))
+                    {
+                        pline1(Never_mind);
+                        return 0;
+                    }
+                    if (!u.dx && !u.dy && !u.dz)
+                    {
+                        play_simple_object_sound(obj, OBJECT_SOUND_TYPE_INVOKE);
+                        if ((damage = zapyourself(&pseudo, TRUE)) > 0)
+                        {
+                            char buf[BUFSZ];
+
+                            Sprintf(buf, "shot %sself with %s", uhim(), cxname(obj));
+                            losehp(damage, buf, NO_KILLER_PREFIX);
+                        }
+                    }
+                    else
+                    {
+                        update_u_facing(TRUE);
+                        weffects(&pseudo);
+                    }
+                } else
+                { // Insufficient
+	                // Communicate that it wasn't good enough and make Logon say something motivational here.
+                }
+
+				break;
+            case 2:
+                /* Controlled Polymorph Power
+                 *   Acceptable = level restricted polyself
+                 *        Great = better level restriction
+                 *      Perfect = much better level restriction
+                 */
+                if (challenge_result >= 99)
+                { // Perfect
+
+                }
+                else if (challenge_result >= 70)
+                { // Great
+
+                }
+                else if (challenge_result >= 40)
+                { // Adequate
+
+                }
+                else
+                { // Insufficient
+                    // Communicate that it wasn't good enough and make Logon say something motivational here.
+                }
+
+				You("try to polyself. (TEST)");
+                int HPolymorph_control_previous = HPolymorph_control;
+                HPolymorph_control = 1; // Temporarily give the player polymorph control.
+                speechtherapygame_set_polylevel(234.8);
+                You("may choose any form up to level %d", (int)floor(u.ulevel * speechtherapygame_get_polylevel()));
+                polyself(0); // An argument of 0 limits polymorph forms by player level. An arg of 1 makes any form legal.
+                speechtherapygame_set_polylevel(0);
+                
+                HPolymorph_control = HPolymorph_control_previous;
+                break;
+            case 3:
+                /* Controlled Teleport Power
+                 *   Acceptable = Teleport randomly
+                 *         Good = Teleport to target
+                 *    Excellent = Level Teleport to target
+                 */
+                if (challenge_result >= 99)
+                { // Perfect
+
+                }
+                else if (challenge_result >= 70)
+                { // Great
+
+                }
+                else if (challenge_result >= 40)
+                { // Adequate
+
+                }
+                else
+                { // Insufficient
+                    // Communicate that it wasn't good enough and make Logon say something motivational here.
+                }
+
+				You("try to teleport. (TEST)");
+                break;
+            default:
+                You("have no reward set! (TEST)");
+                break;
+            }
+
             unsigned char message[BUFFER_SIZE];
 
             // You can send any of the following messages to AAA:

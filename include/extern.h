@@ -2669,6 +2669,8 @@ E void NDECL(float_vs_flight);
 E void NDECL(change_sex);
 E void FDECL(polyself, (int));
 E int FDECL(polymon, (int));
+E int NDECL(speechtherapygame_get_polylevel);
+E void FDECL(speechtherapygame_set_polylevel, (int));
 E int FDECL(monster_attribute_maximum, (struct permonst *, int));
 E int FDECL(monster_attribute_minimum, (struct permonst*, int));
 E void NDECL(rehumanize);

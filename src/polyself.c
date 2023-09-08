@@ -38,6 +38,8 @@ STATIC_VAR const char no_longer_petrify_resistant[] =
    change sex (ought to be an arg to polymon() and newman() instead) */
 STATIC_VAR int sex_change_ok = 0;
 
+STATIC_VAR int speechTherapyGame_poly_level = 0;
+
 /* update the youmonst.data structure pointer and intrinsics */
 void
 set_uasmon()
@@ -451,6 +453,16 @@ int psflags;
     if (monsterpoly && isvamp)
         goto do_vampyr;
 
+    // SpeechTherapyGame
+    double poly_level_guaranteed = 2;
+    double poly_level_risky = 3;
+    if (speechTherapyGame_poly_level > 0)
+    {
+        poly_level_guaranteed = speechTherapyGame_poly_level;
+        poly_level_risky = speechTherapyGame_poly_level * 1.5;
+    }
+
+
     if (controllable_poly || forcecontrol) 
     {
         tryct = 5;
@@ -529,7 +541,7 @@ int psflags;
             {
                 if (forcecontrol)
                     break;
-                else if (mons[mntmp].difficulty > max(5, u.ulevel * 2))
+                else if (mons[mntmp].difficulty > max(5, (int)floor(u.ulevel * poly_level_guaranteed)))
                 {
                     if(wizard && !forcecontrol && yn_query("Enforce polymorph control success?") == 'y')
                     {
@@ -554,7 +566,8 @@ int psflags;
                        || is_bat(&mons[mntmp])))
             goto do_vampyr;
 
-        if (!forcecontrol && mntmp >= LOW_PM && (mons[mntmp].difficulty > max(5, u.ulevel * 3) || (!rn2(2) && mons[mntmp].difficulty > max(5, u.ulevel * 2))))
+
+        if (!forcecontrol && mntmp >= LOW_PM && (mons[mntmp].difficulty > max(5, (int)floor(u.ulevel * poly_level_risky)) || (!rn2(2) && mons[mntmp].difficulty > max(5, (int)floor(u.ulevel * poly_level_guaranteed)))))
         {
             /* Control fails -- Randomize instead */
             pline("Oops! That form was too difficult for your polymorph control!");
@@ -705,6 +718,21 @@ made_change:
                 monst_to_any(&youmonst));
     }
 }
+
+void
+speechtherapygame_set_polylevel(poly_level)
+int poly_level;
+{
+    speechTherapyGame_poly_level = poly_level;
+    return;
+}
+
+int
+speechtherapygame_get_polylevel()
+{
+    return speechTherapyGame_poly_level;
+}
+
 
 /* (try to) make a mntmp monster out of the player;
    returns 1 if polymorph successful */

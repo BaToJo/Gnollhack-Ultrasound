@@ -9709,6 +9709,13 @@ struct monst* mtmp;
         // Fully identify Logon.
         fully_identify_obj(logon);
 
+        /* We repurpose this uchar (which goes unused in the player monster) to store the player's current choice of speech reward.
+         *  1 = Taming
+         *  2 = Controlled Polymorph
+         *  3 = Controlled Teleportation
+         */
+        mtmp->talkstate_item_trading = 1; 
+
         mtmp->speechtherapygame_logon_told_info = 1;
 
         hermit_talk(mtmp, linearray, GHSOUND_NONE);
