@@ -620,6 +620,13 @@ struct you {
     boolean facing_right;
     uchar action;
 
+    /* SpeechTherapyGame */
+    boolean speechTherapyGame_logon_identified;
+    int speechTherapyGame_logon_reward_type;
+    boolean speechtherapygame_logon_told_info;
+    boolean speechtherapygame_logon_told_choose_power;
+
+
 }; /* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)

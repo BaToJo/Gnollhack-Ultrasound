@@ -22,6 +22,10 @@ typedef struct {
 
 static NamedPipe* instance = NULL;
 
+// We use global variables here to pass data around Gnollhack to minimize modification of Gnollhack's existing code, for compatibility with future game updates.
+static double speechTherapyGame_poly_level = 0;
+
+
 NamedPipe* speechTherapyGame_getPipe() {
     // If the pipe struct has not been instantiated yet, create it.
     if (instance == NULL) {
@@ -177,6 +181,48 @@ void speechTherapyGame_closePipe() {
         You("find that the pipe is already closed! Why?");
     }
 }
+
+int speechTherapyGame_challengePlayer(int difficulty) {
+
+    if ((difficulty < 0) || (difficulty > 100))
+    {
+        impossible("A speech challenge was requested with an out-of-range difficulty!"); // Throw an exception in the Gnollhack style.
+        return -1;
+    }
+
+    speechTherapyGame_minimizeGame();
+
+	// Because C needs strings to have memory allocation for them specified at compile time, we are assuming that there will be 4 characters needed for this string: an initial one-character prefix followed by up to 3 characters for the number.
+    char challenge_difficulty_as_string[BUFFER_SIZE];
+    // Convert the integer to a string, prefixed with the letter 'A' which AAA will interpret as a request to serve the player a speech challenge.
+    int number_of_characters_in_string = sprintf(challenge_difficulty_as_string, "A%d", difficulty);
+
+    // You can send any of the following messages to AAA:
+    // A70  - Challenge the player with difficulty 70%. You can replace 70 with any number from 0 to 100.
+    // T  - Send me a test response.
+    // C  - Close your pipe handler.
+    if (speechTherapyGame_sendString(challenge_difficulty_as_string)) {
+        You("request a response from AAA.");
+
+        unsigned char message[BUFFER_SIZE];
+
+        if (speechTherapyGame_receiveByte(message)) {
+            You("hear AAA reply: %d", message[0]);
+            int challenge_result = message[0]; // This incoming message from AAA is the score: an int in the range 0..100.
+            return challenge_result;
+        }
+        else {
+            You("fail to receive a response from AAA.");
+            return -1;
+        }
+    }
+    else {
+        You("fail to send a message on the pipe.");
+        return -1;
+    }
+
+}
+
 
 //int main() {
 //    NamedPipe* pipe = speechTherapyGame_getPipe();

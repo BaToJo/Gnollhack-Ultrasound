@@ -78,8 +78,8 @@ STATIC_DCL int FDECL(do_chat_quantum_disintegration_wand, (struct monst*));
 STATIC_DCL int FDECL(do_chat_quantum_teleportation_wand, (struct monst*));
 
 /* SpeechTherapyGame chat behaviours */
-#define speechtherapygame_logon_told_info special_talk_flag1
-#define speechtherapygame_logon_told_choose_power special_talk_flag2
+//#define speechtherapygame_logon_told_info special_talk_flag1
+//#define speechtherapygame_logon_told_choose_power special_talk_flag2
 STATIC_DCL int FDECL(do_chat_speechtherapygame_info, (struct monst*));
 STATIC_DCL int FDECL(do_chat_speechtherapygame_choose_power, (struct monst*));
 STATIC_DCL int FDECL(do_chat_speechtherapygame_power_taming, (struct monst*));
@@ -2455,7 +2455,7 @@ struct monst* mtmp;
         {
 	        if (carrying(CAGED_SPEECH_DEMON)) /* The base item type of Logon the Guide */
 	        {
-                if (mtmp->speechtherapygame_logon_told_choose_power)
+                if (u.speechtherapygame_logon_told_choose_power)
                 {
                     /* Taming Power
                      *   Acceptable = Charm Monster Spell effect (temporary)
@@ -2502,10 +2502,10 @@ struct monst* mtmp;
                         available_chat_list[chatnum].name, MENU_UNSELECTED);
                     chatnum++;
 
-                    mtmp->speechtherapygame_logon_told_choose_power = 0;
+                    u.speechtherapygame_logon_told_choose_power = 0;
                 } else
                 {
-                    if (mtmp->speechtherapygame_logon_told_info)
+                    if (u.speechtherapygame_logon_told_info)
                     {
                         Strcpy(available_chat_list[chatnum].name, "Ask how to use your speech powers");
                     }
@@ -2525,7 +2525,7 @@ struct monst* mtmp;
 
                     chatnum++;
 
-                    if (mtmp->speechtherapygame_logon_told_info)
+                    if (u.speechtherapygame_logon_told_info)
                     {
                         Strcpy(available_chat_list[chatnum].name, "Choose how your power is focused");
                         available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_choose_power;
@@ -9675,7 +9675,7 @@ struct monst* mtmp;
     if (!mtmp || !m_speak_check(mtmp))
         return 0;
 
-    if (mtmp->speechtherapygame_logon_told_info)
+    if (u.speechtherapygame_logon_told_info)
     {
         const char* linearray[6] = {
             "You can call on the power of your voice whenever you want.",
@@ -9709,16 +9709,20 @@ struct monst* mtmp;
         // Fully identify Logon.
         fully_identify_obj(logon);
 
+        u.speechTherapyGame_logon_identified = TRUE;
+
         /* We repurpose this uchar (which goes unused in the player monster) to store the player's current choice of speech reward.
          *  1 = Taming
          *  2 = Controlled Polymorph
          *  3 = Controlled Teleportation
          */
-        mtmp->talkstate_item_trading = 1; 
+        u.speechTherapyGame_logon_reward_type = 2;
 
-        mtmp->speechtherapygame_logon_told_info = 1;
+        u.speechtherapygame_logon_told_info = TRUE;
 
         hermit_talk(mtmp, linearray, GHSOUND_NONE);
+
+        // do_chat_speechtherapygame_choose_power(&mtmp);
     }
 
     return 1;
@@ -9735,7 +9739,7 @@ struct monst* mtmp;
     // Find Logon in the player's inventory.
     struct obj* logon = carrying(CAGED_SPEECH_DEMON);
 
-    mtmp->speechtherapygame_logon_told_choose_power = 1;
+    u.speechtherapygame_logon_told_choose_power = 1;
 
     dochatmon(&youmonst); // Reopen the chat with Logon immediately.
 
@@ -9758,6 +9762,7 @@ struct monst* mtmp;
     struct obj* logon = carrying(CAGED_SPEECH_DEMON);
 
     // TODO: Put Taming power here!
+    u.speechTherapyGame_logon_reward_type = 1; // Store the player's current choice of speech reward.
 
     hermit_talk(mtmp, linearray, GHSOUND_NONE);
 
@@ -9779,6 +9784,7 @@ struct monst* mtmp;
     struct obj* logon = carrying(CAGED_SPEECH_DEMON);
 
     // TODO: Put Polymorph power here!
+    u.speechTherapyGame_logon_reward_type = 2; // Store the player's current choice of speech reward.
 
     hermit_talk(mtmp, linearray, GHSOUND_NONE);
 
@@ -9800,6 +9806,7 @@ struct monst* mtmp;
     struct obj* logon = carrying(CAGED_SPEECH_DEMON);
 
     // TODO: Put Teleport power here!
+    u.speechTherapyGame_logon_reward_type = 3; // Store the player's current choice of speech reward.
 
     hermit_talk(mtmp, linearray, GHSOUND_NONE);
 

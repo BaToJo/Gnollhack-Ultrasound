@@ -3003,8 +3003,17 @@ struct obj *obj;
         case ARTINVOKE_SPEECHTHERAPYGAME:
         {
 
-            int challenge_result = 60;
-            int challenge_threshold_perfect = 99;
+            int challenge_difficulty = rn2(101); // Returns a random integer in the range 0 (inclusive) to n (exclusive)
+
+            int challenge_result = speechTherapyGame_challengePlayer(challenge_difficulty);
+
+			if (challenge_result == -1) 
+			{
+                // Exception handling is done within the challengePlayer function, so we can just exit.
+                break;
+			}
+
+            int challenge_threshold_perfect = 95;
             int challenge_threshold_great = 70;
             int challenge_threshold_adequate = 40;
 
@@ -3013,7 +3022,7 @@ struct obj *obj;
 			 * To do this, we can keep a weighted moving average of results and compare the current result to it.
 			 */
 
-			switch(*(&youmonst.talkstate_item_trading))
+			switch(*(&u.speechTherapyGame_logon_reward_type))
 			{
             case 1:
                 /* Taming Power
@@ -3080,15 +3089,15 @@ struct obj *obj;
                  *        Great = better level restriction
                  *      Perfect = much better level restriction
                  */
-                if (challenge_result >= 99)
+                if (challenge_result >= challenge_threshold_perfect)
                 { // Perfect
 
                 }
-                else if (challenge_result >= 70)
+                else if (challenge_result >= challenge_threshold_great)
                 { // Great
 
                 }
-                else if (challenge_result >= 40)
+                else if (challenge_result >= challenge_threshold_adequate)
                 { // Adequate
 
                 }
@@ -3100,7 +3109,7 @@ struct obj *obj;
 				You("try to polyself. (TEST)");
                 int HPolymorph_control_previous = HPolymorph_control;
                 HPolymorph_control = 1; // Temporarily give the player polymorph control.
-                speechtherapygame_set_polylevel(234.8);
+                speechtherapygame_set_polylevel(challenge_result/20);
                 You("may choose any form up to level %d", (int)floor(u.ulevel * speechtherapygame_get_polylevel()));
                 polyself(0); // An argument of 0 limits polymorph forms by player level. An arg of 1 makes any form legal.
                 speechtherapygame_set_polylevel(0);
@@ -3113,15 +3122,15 @@ struct obj *obj;
                  *         Good = Teleport to target
                  *    Excellent = Level Teleport to target
                  */
-                if (challenge_result >= 99)
+                if (challenge_result >= challenge_threshold_perfect)
                 { // Perfect
 
                 }
-                else if (challenge_result >= 70)
+                else if (challenge_result >= challenge_threshold_great)
                 { // Great
 
                 }
-                else if (challenge_result >= 40)
+                else if (challenge_result >= challenge_threshold_adequate)
                 { // Adequate
 
                 }
@@ -3137,28 +3146,6 @@ struct obj *obj;
                 break;
             }
 
-            unsigned char message[BUFFER_SIZE];
-
-            // You can send any of the following messages to AAA:
-            // T  - Send me a test response.
-            // C  - Close your pipe handler.
-            if (speechTherapyGame_sendString("T")) {
-                You("request a test response from AAA.");
-
-                if (speechTherapyGame_receiveByte(message)) {
-                    You("hear AAA reply: %d", message[0]);
-                    play_simple_object_sound(obj, OBJECT_SOUND_TYPE_INVOKE);
-                }
-                else {
-                    You("fail to receive a response from AAA.");
-                    play_simple_object_sound(obj, OBJECT_SOUND_TYPE_TAKE_OFF);
-                }
-            }
-            else {
-                You("fail to send a message on the pipe.");
-                play_simple_object_sound(obj, OBJECT_SOUND_TYPE_TAKE_OFF);
-            }
-            break;
         }
 
         } /* switch */
