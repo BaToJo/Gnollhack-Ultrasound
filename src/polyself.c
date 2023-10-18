@@ -454,12 +454,12 @@ int psflags;
         goto do_vampyr;
 
     // SpeechTherapyGame
-    double poly_level_guaranteed = 2;
-    double poly_level_risky = 3;
+    double poly_level_guaranteed = 1;
+    double poly_level_risky = 2;
     if (speechTherapyGame_poly_level > 0)
     {
         poly_level_guaranteed = speechTherapyGame_poly_level;
-        poly_level_risky = speechTherapyGame_poly_level * 1.5;
+        poly_level_risky = (speechTherapyGame_poly_level * 1.1) + 3; // A little wiggle room in case the player doesn't know the level of a monster.
     }
 
 
@@ -541,7 +541,7 @@ int psflags;
             {
                 if (forcecontrol)
                     break;
-                else if (mons[mntmp].difficulty > max(5, (int)floor(u.ulevel * poly_level_guaranteed)))
+                else if (mons[mntmp].difficulty > max(5, (int)floor(poly_level_guaranteed)))
                 {
                     if(wizard && !forcecontrol && yn_query("Enforce polymorph control success?") == 'y')
                     {
@@ -567,7 +567,7 @@ int psflags;
             goto do_vampyr;
 
 
-        if (!forcecontrol && mntmp >= LOW_PM && (mons[mntmp].difficulty > max(5, (int)floor(u.ulevel * poly_level_risky)) || (!rn2(2) && mons[mntmp].difficulty > max(5, (int)floor(u.ulevel * poly_level_guaranteed)))))
+        if (!forcecontrol && mntmp >= LOW_PM && (mons[mntmp].difficulty > max(5, (int)floor(poly_level_risky)) || (!rn2(2) && mons[mntmp].difficulty > max(5, (int)floor(poly_level_guaranteed)))))
         {
             /* Control fails -- Randomize instead */
             pline("Oops! That form was too difficult for your polymorph control!");

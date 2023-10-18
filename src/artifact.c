@@ -3002,10 +3002,25 @@ struct obj *obj;
         }
         case ARTINVOKE_SPEECHTHERAPYGAME:
         {
+            // Clamp the limits to the range 0..100.
+            // u.speechTherapyGame_challenge_upper_limit = min(max(u.speechTherapyGame_challenge_upper_limit, 100),0);
 
-            int challenge_difficulty = rn2(101); // Returns a random integer in the range 0 (inclusive) to n (exclusive)
+        	// This system was conceived of as a tool for therapists to prepare speech targets for, in which they would know their individual client's capabilities and assign difficulties to the targets. However, in the user testing for this project, we cannot know the strengths and weaknesses of each test participant ahead of time, so we give every speech challenge an equal probability of being picked. 
+            u.speechTherapyGame_challenge_upper_limit = 55;
 
-            int challenge_result = speechTherapyGame_challengePlayer(challenge_difficulty);
+            int challenge_difficulty = rn2(u.speechTherapyGame_challenge_upper_limit + 1); // Returns a random integer in the range 0 (inclusive) to n (exclusive)
+
+            int challenge_result = speechTherapyGame_challengePlayer(&challenge_difficulty);
+
+            /*
+            if (challenge_result < 40) // If the player gets a bad result on the challenge...
+            {
+                u.speechTherapyGame_challenge_upper_limit = round(u.speechTherapyGame_challenge_upper_limit * 0.9); // Reduce the upper limit on the difficulty by 10%.
+            } else
+            {
+                u.speechTherapyGame_challenge_upper_limit = 100; // Else reset the range to allow all difficulties.
+            }
+			*/
 
 			if (challenge_result == -1) 
 			{
@@ -3017,10 +3032,35 @@ struct obj *obj;
             int challenge_threshold_great = 70;
             int challenge_threshold_adequate = 40;
 
-            int challenge_rolling_average_result = challenge_result;
 			/* We want to reward both objectively good speech production, and also reward improvement over previous results.
-			 * To do this, we can keep a weighted moving average of results and compare the current result to it.
+			   To do this, we can keep a weighted moving average of results and compare the current result to it.
+			   The player is rewarded extra bonus score for a result that's better than their moving average.
+			   If the player is getting generally poor scores (ie. their moving average is low) then we reward their improvements a lot more than if they get consistently high scores. I think this is necessary to motivate people who are really struggling: we want any small victory they get to feel huge.
 			 */
+
+        	// Update the weighted moving average to reflect the latest data point.
+            u.speechTherapyGame_weighted_average_challenge_result = (u.speechTherapyGame_weighted_average_challenge_result * (1 - speechTherapyGame_weighted_average_alpha)) + (challenge_result * speechTherapyGame_weighted_average_alpha);
+
+            // How much did the player's latest result improve on their moving average?
+            float improvement = max(challenge_result - u.speechTherapyGame_weighted_average_challenge_result, 0);
+
+            // If the player is getting generally poor scores (ie. their moving average is low) then we reward their improvements a lot more than if they get consistently high scores. I think this is necessary to motivate people who are really struggling: we want any small victory they get to feel huge.
+        	float improvement_exponent = (100 - u.speechTherapyGame_weighted_average_challenge_result) / 100;
+
+            // We award some extra bonus points which scale logarithmically with the magnitude of the improvement, so big improvements don't receive excessive bonuses. As the player's average score improves, the logarithmic scaling becomes more punishing, so smaller bonuses are rewarded if the player is already doing well. 
+            int player_score = min(floor(challenge_result + pow(improvement, improvement_exponent)), 100);
+
+            // We also have an accumulated comeback-bonus score that increases every consecutive time the player gets a really bad score, then when the player gets a score that's good enough for a reward, this comeback bonus is added onto to make it a much bigger reward, and the comeback bonus resets to zero.
+            if (challenge_result < challenge_threshold_adequate)
+            {
+                u.speechTherapyGame_comeback_bonus = challenge_result + (u.speechTherapyGame_comeback_bonus * 1.1) + 10;
+            } else
+            {
+                player_score += u.speechTherapyGame_comeback_bonus;
+                u.speechTherapyGame_comeback_bonus = 0;
+            }
+
+            // The player's moving average score, and thus the amount of score bonuses they get, are tied to their save file. The moving average for a new game begins at zero so that the player is rewarded a lot for early successes, which helps with early player retention into the system. 
 
 			switch(*(&u.speechTherapyGame_logon_reward_type))
 			{
@@ -3032,7 +3072,7 @@ struct obj *obj;
 				 */
                 You("try to tame. (TEST)");
 
-                if (challenge_result >= challenge_threshold_perfect)
+                if (player_score >= challenge_threshold_perfect)
                 {
                     struct obj pseudo;
                     pseudo = zeroobj; /* neither cursed nor blessed, zero oextra too */
@@ -3041,10 +3081,10 @@ struct obj *obj;
                     (void)seffects(&pseudo, &effect_happened, &youmonst);
                     break;
                 }
-                else if (challenge_result >= challenge_threshold_adequate)
+                else if (player_score >= challenge_threshold_adequate)
                 { // Perfect or Great
                     struct obj pseudo = zeroobj;
-                    if (challenge_result >= challenge_threshold_great)
+                    if (player_score >= challenge_threshold_great)
                     {
                         // Permanent tame.
                         pseudo.otyp = SPE_DOMINATE_MONSTER;
@@ -3089,32 +3129,23 @@ struct obj *obj;
                  *        Great = better level restriction
                  *      Perfect = much better level restriction
                  */
-                if (challenge_result >= challenge_threshold_perfect)
-                { // Perfect
-
-                }
-                else if (challenge_result >= challenge_threshold_great)
-                { // Great
-
-                }
-                else if (challenge_result >= challenge_threshold_adequate)
+				if (player_score >= challenge_threshold_adequate)
                 { // Adequate
-
+				You("try to polyself. (TEST)");
+                int HPolymorph_control_previous = HPolymorph_control;
+                HPolymorph_control = 1; // Temporarily give the player polymorph control.
+                    speechtherapygame_set_polylevel(u.ulevel * (1+(player_score-40)/210) + ((player_score - 40)/30)); // Allow polymorphs in a range that starts generous, with best-case 3x level multiplier at level 1, tailing off to a 1.3x level multiplier at level 30.
+                    You("may choose any form up to level %d", (int)floor(speechtherapygame_get_polylevel()));
+                polyself(0); // An argument of 0 limits polymorph forms by player level. An arg of 1 makes any form legal.
+                speechtherapygame_set_polylevel(0);
+                
+                HPolymorph_control = HPolymorph_control_previous;
                 }
                 else
                 { // Insufficient
                     // Communicate that it wasn't good enough and make Logon say something motivational here.
                 }
 
-				You("try to polyself. (TEST)");
-                int HPolymorph_control_previous = HPolymorph_control;
-                HPolymorph_control = 1; // Temporarily give the player polymorph control.
-                speechtherapygame_set_polylevel(challenge_result/20);
-                You("may choose any form up to level %d", (int)floor(u.ulevel * speechtherapygame_get_polylevel()));
-                polyself(0); // An argument of 0 limits polymorph forms by player level. An arg of 1 makes any form legal.
-                speechtherapygame_set_polylevel(0);
-                
-                HPolymorph_control = HPolymorph_control_previous;
                 break;
             case 3:
                 /* Controlled Teleport Power
@@ -3122,15 +3153,15 @@ struct obj *obj;
                  *         Good = Teleport to target
                  *    Excellent = Level Teleport to target
                  */
-                if (challenge_result >= challenge_threshold_perfect)
+                if (player_score >= challenge_threshold_perfect)
                 { // Perfect
 
                 }
-                else if (challenge_result >= challenge_threshold_great)
+                else if (player_score >= challenge_threshold_great)
                 { // Great
 
                 }
-                else if (challenge_result >= challenge_threshold_adequate)
+                else if (player_score >= challenge_threshold_adequate)
                 { // Adequate
 
                 }

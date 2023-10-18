@@ -621,11 +621,19 @@ struct you {
     uchar action;
 
     /* SpeechTherapyGame */
-    boolean speechTherapyGame_logon_identified;
-    int speechTherapyGame_logon_reward_type;
-    boolean speechtherapygame_logon_told_info;
-    boolean speechtherapygame_logon_told_choose_power;
+    boolean speechTherapyGame_logon_identified; // Has the player identified Logon by interacting with him as an item in the player's inventory?
+    int speechTherapyGame_logon_reward_type; // Which of the available challenge rewards is active?
+    boolean speechtherapygame_logon_told_info; // Has the player heard the introductory explanations of the challenge and reward system by talking to Logon yet?
+    boolean speechtherapygame_logon_told_choose_power; // Has the player chosen a challenge reward by talking to Logon yet?
+    int speechTherapyGame_challenge_upper_limit; // This is only used as part of the user testing in which we don't know how difficult the testing participants will find each prompt.
+    float speechTherapyGame_weighted_average_challenge_result; // The weighted moving average of the player score since they started the game.
+    float speechTherapyGame_comeback_bonus; // An accumulated bonus score that increases every consecutive time the player gets an extremely bad score, then when the player gets a score that's good enough for a reward, this comeback bonus is added onto to make it a much bigger reward, and the comeback bonus resets to zero.
 
+    /* This Alpha coefficient below controls how fast the moving average of the player score catches up with the latest results. Higher values make the moving average respond faster to the latest data. A value of 0.5 would make the average converge by half its difference with the latest data point. A value of 0.25 would make it converge by a quarter of the difference.
+     
+       This value of 0.035 below makes it converge by 50% after 20 iterations, and converge by 95% after 65 iterations.
+     */
+#define speechTherapyGame_weighted_average_alpha 0.035
 
 }; /* end of `struct you' */
 
