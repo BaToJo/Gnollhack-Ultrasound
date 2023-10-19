@@ -25,6 +25,88 @@ static NamedPipe* instance = NULL;
 // We use global variables here to pass data around Gnollhack to minimize modification of Gnollhack's existing code, for compatibility with future game updates.
 static double speechTherapyGame_poly_level = 0;
 
+bool first_failure = TRUE;
+
+const char* motivational_failure_quotes[38] = {
+    "Logon say, \"Every defeat is a necessary step towards mastery.\"",
+	"Logon say, \"Don't rush. Use your patience with pride.\"",
+	"Logon say, \"Failure is temporary. Your lessons and growth from it are permanent.\"",
+	"Logon say, \"Never give up. Never surrender.\"",
+	"Logon say, \"Again? Good.\"",
+	"Logon say, \"Fill the unforgiving minute with sixty seconds' worth of distance run.\"",
+	"Logon say, \"The expert has failed more times than the novice has even tried.\"",
+	"Logon say, \"When you are persistent, victory is not 'if', but 'when'.\"",
+	"Logon say, \"Your strongest power comes from within.\"",
+	"Logon say, \"Words are even mightier than weapons.\"",
+	"Logon say, \"Words alone have brought tyrants to their knees.\"",
+	"Logon say, \"Speak, and the universe listens.\"",
+	"Logon say, \"Fight with unwavering resolve.\"",
+	"Logon say, \"The wise fear the person who has failed a thousand times, because it means a thousand times they have got back up and kept going.\"",
+	"Logon say, \"The monsters fear your next move. Give them no rest\"."
+	"Logon say, \"When you were born and spoke your first word, the universe trembled.\"",
+	"Logon say, \"Don't respect the knight in shining armor. Armor that's shiny has never been tested.\"",
+	"Logon say, \"A person who brags about never failing isn't pushing their limits.\"",
+	"Logon say, \"Dare to do difficult things.\"",
+	"Logon say, \"Fear is an invitation to the brave.\"",
+	"Logon say, \"What you earn through challenge and victory, you wield better than someone who had it handed to them.\"",
+	"Logon say, \"No matter who guides you, your victories are yours alone.\"",
+	"Logon say, \"Language is a powerful tool nobody can take away from you.\"",
+	"Logon say, \"It's not the size of your words that matters, it's what you do with them.\"",
+	"Logon say, \"There are hundreds of thousands of words out there. Find the ones that work best for you.\"",
+	"Logon say, \"Be the author of your own story.\"",
+	"Logon say, \"You cannot know that something can't be done, only that you haven't done it yet.\"",
+	"Logon say, \"You are capable of things, now, that you could only dream of when you were younger. Imagine what you will be capable of tomorrow.\"",
+	"Logon say, \"Every great and powerful person stumbled countless times on their journey.\"",
+	"Logon say, \"If you're trying and failing, you're doing infinitely better than people who aren't trying at all.\"",
+	"Logon say, \"That you are here, now, means you have beaten every bad day you've ever had.\"",
+	"Logon say, \"Don't try hard because someone else tells you to. Try hard for you.\"",
+	"Logon say, \"Yesterday's history, and tomorrow's a mystery, but today is a gift. That's why they call it the present!\"",
+	"Logon say, \"Ask, and you shall receive.\"",
+	"Logon say, \"Be persistent, and you will win.\"",
+	"Logon say, \"It's good to rest, but don't stop.\"",
+	"Logon say, \"New-born animals learn their most vital survival skill first. Yours was to communicate.\"",
+	"Logon say, \"I once knew a young lady named Washoe, who was determined to be heard.\"",
+	"Logon say, \"Taking on a hard challenge shows the strength of your will\"."
+};
+
+const char* motivational_failure_quotes_deaf[5] = {
+    /* You see */ "Logon look at you with anticipation.",
+    "Logon grin at you.",
+    "Logon wink at you with a smile.",
+    "Logon give you a thumbs up.",
+    "Logon nod, with a smile."
+};
+
+
+// Prints to the screen the next motivational quote that encourages persistence through failure.
+void speechTherapyGame_display_motivational_quote()
+{
+    if (first_failure)
+    {
+        pline_ex1(ATR_NONE, CLR_MSG_FAIL, "You tried well, but unfortunately that wasn't right.");
+        pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "There is no penalty for getting it wrong. Try again!");
+        first_failure = FALSE;
+    } else
+    {
+        if (Deaf)
+        {
+            You_see(motivational_failure_quotes_deaf[u.speechTherapyGame_motivational_quote_deaf_index % sizeof(motivational_failure_quotes_deaf)]);
+            u.speechTherapyGame_motivational_quote_deaf_index++;
+        }
+        else
+        {
+            You_hear(motivational_failure_quotes[u.speechTherapyGame_motivational_quote_index % sizeof(motivational_failure_quotes)]);
+            u.speechTherapyGame_motivational_quote_index++;
+        }
+    }
+}
+
+
+void speechTherapyGame_minimizeGame()
+{
+    // This is redundant, because we can force AAA to the foreground when we want to.
+    // ShowWindow(hWnd, SW_MINIMIZE);
+}
 
 NamedPipe* speechTherapyGame_getPipe() {
     // If the pipe struct has not been instantiated yet, create it.
@@ -182,9 +264,10 @@ void speechTherapyGame_closePipe() {
     }
 }
 
-int speechTherapyGame_challengePlayer(int difficulty) {
+// The argument is written to with the actual difficulty of the challenge served to the player by AAA.
+int speechTherapyGame_challengePlayer(int* difficulty) {
 
-    if ((difficulty < 0) || (difficulty > 100))
+    if ((*difficulty < 0) || (*difficulty > 100))
     {
         impossible("A speech challenge was requested with an out-of-range difficulty!"); // Throw an exception in the Gnollhack style.
         return -1;
@@ -195,7 +278,7 @@ int speechTherapyGame_challengePlayer(int difficulty) {
 	// Because C needs strings to have memory allocation for them specified at compile time, we are assuming that there will be 4 characters needed for this string: an initial one-character prefix followed by up to 3 characters for the number.
     char challenge_difficulty_as_string[BUFFER_SIZE];
     // Convert the integer to a string, prefixed with the letter 'A' which AAA will interpret as a request to serve the player a speech challenge.
-    int number_of_characters_in_string = sprintf(challenge_difficulty_as_string, "A%d", difficulty);
+    int number_of_characters_in_string = sprintf(challenge_difficulty_as_string, "A%d", *difficulty);
 
     // You can send any of the following messages to AAA:
     // A70  - Challenge the player with difficulty 70%. You can replace 70 with any number from 0 to 100.
@@ -208,7 +291,9 @@ int speechTherapyGame_challengePlayer(int difficulty) {
 
         if (speechTherapyGame_receiveByte(message)) {
             You("hear AAA reply: %d", message[0]);
-            int challenge_result = message[0]; // This incoming message from AAA is the score: an int in the range 0..100.
+            int challenge_result = message[0]; // The first byte of the incoming message from AAA is the score: an int in the range 0..100.
+            int actual_difficulty = message[1]; // The second byte is the actual difficulty of the challenge served to the player.
+            *difficulty = actual_difficulty; // We set the difficulty passed in as argument to the actual difficulty of the challenge served to the player.
             return challenge_result;
         }
         else {

@@ -3058,9 +3058,29 @@ struct obj *obj;
             {
                 player_score += u.speechTherapyGame_comeback_bonus;
                 u.speechTherapyGame_comeback_bonus = 0;
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Comeback bonus!");
             }
 
             // The player's moving average score, and thus the amount of score bonuses they get, are tied to their save file. The moving average for a new game begins at zero so that the player is rewarded a lot for early successes, which helps with early player retention into the system. 
+
+            if (challenge_result >= challenge_threshold_perfect)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "PERFECT PRONUNCIATION! Exceptionally well done!");
+            else if (challenge_result >= challenge_threshold_great && player_score >= challenge_threshold_perfect)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Great pronunciation! Good progress!");
+            else if (challenge_result >= challenge_threshold_adequate && player_score >= challenge_threshold_perfect)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Good pronunciation! Amazing progress! Very well done!");
+            else if (challenge_result < challenge_threshold_adequate && player_score >= challenge_threshold_perfect)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Amazing progress! Very well done!");
+            else if (challenge_result >= challenge_threshold_great && player_score >= challenge_threshold_great)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Great pronunciation!");
+            else if (challenge_result >= challenge_threshold_adequate && player_score >= challenge_threshold_great)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Good pronunciation! Good progress!");
+            else if (challenge_result < challenge_threshold_adequate && player_score >= challenge_threshold_great)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Great progress! Well done!");
+            else if (challenge_result >= challenge_threshold_adequate && player_score >= challenge_threshold_adequate)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Good pronunciation!");
+            else if (challenge_result < challenge_threshold_adequate && player_score >= challenge_threshold_adequate)
+                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Good progress!");
 
 			switch(*(&u.speechTherapyGame_logon_reward_type))
 			{
@@ -3120,6 +3140,7 @@ struct obj *obj;
                 } else
                 { // Insufficient
 	                // Communicate that it wasn't good enough and make Logon say something motivational here.
+                    speechTherapyGame_display_motivational_quote();
                 }
 
 				break;
@@ -3144,6 +3165,7 @@ struct obj *obj;
                 else
                 { // Insufficient
                     // Communicate that it wasn't good enough and make Logon say something motivational here.
+                    speechTherapyGame_display_motivational_quote();
                 }
 
                 break;

@@ -496,7 +496,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL, CRYSTAL_BALL,
     0,                            // Invocation duration (die size)
     0,                            // Invocation duration (mod, eg. +4)
     0,                            // Mana cost
-    3,                            // Cooldown until it repowers
+    1,                            // Cooldown until it repowers
     A_NONE,                       // Alignment
     NON_PM,                       // Class restriction
     NON_PM,                       // Racial restriction

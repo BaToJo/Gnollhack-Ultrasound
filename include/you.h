@@ -625,6 +625,8 @@ struct you {
     int speechTherapyGame_logon_reward_type; // Which of the available challenge rewards is active?
     boolean speechtherapygame_logon_told_info; // Has the player heard the introductory explanations of the challenge and reward system by talking to Logon yet?
     boolean speechtherapygame_logon_told_choose_power; // Has the player chosen a challenge reward by talking to Logon yet?
+    int speechTherapyGame_motivational_quote_index; // This is incremented after every time the player fails a speech challenge, and Logon quips the quotation at the index.
+    int speechTherapyGame_motivational_quote_deaf_index; 
     int speechTherapyGame_challenge_upper_limit; // This is only used as part of the user testing in which we don't know how difficult the testing participants will find each prompt.
     float speechTherapyGame_weighted_average_challenge_result; // The weighted moving average of the player score since they started the game.
     float speechTherapyGame_comeback_bonus; // An accumulated bonus score that increases every consecutive time the player gets an extremely bad score, then when the player gets a score that's good enough for a reward, this comeback bonus is added onto to make it a much bigger reward, and the comeback bonus resets to zero.
