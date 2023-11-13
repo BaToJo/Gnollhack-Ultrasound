@@ -81,9 +81,9 @@ const char* motivational_failure_quotes_deaf[5] = {
 // Prints to the screen the next motivational quote that encourages persistence through failure.
 void speechTherapyGame_display_motivational_quote()
 {
+    pline_ex1(ATR_NONE, CLR_MSG_FAIL, "You tried well, but unfortunately that wasn't right.");
     if (first_failure)
     {
-        pline_ex1(ATR_NONE, CLR_MSG_FAIL, "You tried well, but unfortunately that wasn't right.");
         pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "There is no penalty for getting it wrong. Try again!");
         first_failure = FALSE;
     } else
@@ -132,7 +132,7 @@ NamedPipe* speechTherapyGame_getPipe() {
 
         if (instance->pipeHandle == INVALID_HANDLE_VALUE) {
             instance->isConnected = false;
-            You("fail to connect to the pipe! (%d)", error);
+            pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The game fails to connect to the speech software!");
             return NULL;
         } else
         {
@@ -162,7 +162,7 @@ bool speechTherapyGame_sendString(const char* message) {
         }
         else
         {
-            You("fail to write to the pipe! (%d)", error);
+            pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The game fails to send a string message to the speech software!");
         }
         return result;
     }
@@ -188,7 +188,7 @@ bool speechTherapyGame_receiveString(char* buffer, DWORD bufferSize) {
         }
         else
         {
-            You("fail to read from the pipe! (%d)", error);
+            pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The game fails to read a string message from the speech software!");
         }
         return result;
     }
@@ -215,6 +215,7 @@ bool speechTherapyGame_sendByte(const MESSAGE_TYPE byte) {
         else
         {
             You("fail to write to the pipe! (%d)",error);
+            pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The game fails to send a message to the speech software!");
         }
         return result;
     }
@@ -240,7 +241,7 @@ bool speechTherapyGame_receiveByte(MESSAGE_TYPE* byte) {
         }
         else
         {
-            You("fail to read from the pipe! (%d)", error);
+            pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The game fails to read a message from the speech software!");
         }
         return result;
     }
@@ -260,14 +261,14 @@ void speechTherapyGame_closePipe() {
         // You("successfully close the pipe.");
     } else
     {
-        You("find that the pipe is already closed! Why?");
+        pline_ex1(ATR_NONE, CLR_MSG_WARNING, "The game attempts to close the pipe and finds that it is already closed!");
     }
 }
 
 // The argument is written to with the actual difficulty of the challenge served to the player by AAA.
 int speechTherapyGame_challengePlayer(int* difficulty) {
 
-    if ((*difficulty < 0) || (*difficulty > 100))
+    if ((*difficulty < -1) || (*difficulty > 100))
     {
         impossible("A speech challenge was requested with an out-of-range difficulty!"); // Throw an exception in the Gnollhack style.
         return -1;
@@ -285,24 +286,24 @@ int speechTherapyGame_challengePlayer(int* difficulty) {
     // T  - Send me a test response.
     // C  - Close your pipe handler.
     if (speechTherapyGame_sendString(challenge_difficulty_as_string)) {
-        You("request a response from AAA.");
+        // You("request a response from AAA.");
 
         unsigned char message[BUFFER_SIZE];
 
         if (speechTherapyGame_receiveByte(message)) {
-            You("hear AAA reply: %d", message[0]);
+            // You("hear AAA reply: %d", message[0]);
             int challenge_result = message[0]; // The first byte of the incoming message from AAA is the score: an int in the range 0..100.
             int actual_difficulty = message[1]; // The second byte is the actual difficulty of the challenge served to the player.
             *difficulty = actual_difficulty; // We set the difficulty passed in as argument to the actual difficulty of the challenge served to the player.
             return challenge_result;
         }
         else {
-            You("fail to receive a response from AAA.");
+            pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The speech software doesn't seem to be responding! Is it running?");
             return -1;
         }
     }
     else {
-        You("fail to send a message on the pipe.");
+        pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "The speech software doesn't seem to be connected! Is it running?");
         return -1;
     }
 

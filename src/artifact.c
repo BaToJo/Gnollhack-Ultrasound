@@ -3006,9 +3006,8 @@ struct obj *obj;
             // u.speechTherapyGame_challenge_upper_limit = min(max(u.speechTherapyGame_challenge_upper_limit, 100),0);
 
         	// This system was conceived of as a tool for therapists to prepare speech targets for, in which they would know their individual client's capabilities and assign difficulties to the targets. However, in the user testing for this project, we cannot know the strengths and weaknesses of each test participant ahead of time, so we give every speech challenge an equal probability of being picked. 
-            u.speechTherapyGame_challenge_upper_limit = 55;
 
-            int challenge_difficulty = rn2(u.speechTherapyGame_challenge_upper_limit + 1); // Returns a random integer in the range 0 (inclusive) to n (exclusive)
+            int challenge_difficulty = -1; // Tell AAA to serve us a random difficulty by asking for -1. To ask for a specific difficulty, you would use a positive integer, and the difficulty closest to that integer would be served to the player.
 
             int challenge_result = speechTherapyGame_challengePlayer(&challenge_difficulty);
 
@@ -3058,7 +3057,7 @@ struct obj *obj;
             {
                 player_score += u.speechTherapyGame_comeback_bonus;
                 u.speechTherapyGame_comeback_bonus = 0;
-                pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "Comeback bonus!");
+                pline_ex1(ATR_NONE, CLR_MSG_MYSTICAL, "Comeback bonus!");
             }
 
             // The player's moving average score, and thus the amount of score bonuses they get, are tied to their save file. The moving average for a new game begins at zero so that the player is rewarded a lot for early successes, which helps with early player retention into the system. 
@@ -3090,8 +3089,8 @@ struct obj *obj;
 				 *         Good = Dominate Monster Spell effect (permanent)
 				 *    Excellent = Mass Dominate Monster Spell effect (area, permanent)
 				 */
-                You("try to tame. (TEST)");
-
+                Your("voice reaches out, carrying your power...");
+                
                 if (player_score >= challenge_threshold_perfect)
                 {
                     struct obj pseudo;
@@ -3152,7 +3151,7 @@ struct obj *obj;
                  */
 				if (player_score >= challenge_threshold_adequate)
                 { // Adequate
-				You("try to polyself. (TEST)");
+				Your("voice's power shapes who you are...");
                 int HPolymorph_control_previous = HPolymorph_control;
                 HPolymorph_control = 1; // Temporarily give the player polymorph control.
                     speechtherapygame_set_polylevel(u.ulevel * (1+(player_score-40)/210) + ((player_score - 40)/30)); // Allow polymorphs in a range that starts generous, with best-case 3x level multiplier at level 1, tailing off to a 1.3x level multiplier at level 30.
@@ -3195,7 +3194,7 @@ struct obj *obj;
 				You("try to teleport. (TEST)");
                 break;
             default:
-                You("have no reward set! (TEST)");
+                pline_ex1(ATR_NONE, CLR_MSG_NEGATIVE, "You have not chosen a power! Apply Logon to choose your power.");
                 break;
             }
 

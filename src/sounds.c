@@ -2492,6 +2492,7 @@ struct monst* mtmp;
                      *         Good = Teleport to target
                      *    Excellent = Level Teleport to target
                      */
+                    /*
                     Strcpy(available_chat_list[chatnum].name, "I can go anywhere I want to");
                     available_chat_list[chatnum].function_ptr = &do_chat_speechtherapygame_power_teleport;
                     available_chat_list[chatnum].charnum = 'a' + chatnum;
@@ -2501,6 +2502,7 @@ struct monst* mtmp;
                         any.a_char, 0, ATR_NONE, NO_COLOR,
                         available_chat_list[chatnum].name, MENU_UNSELECTED);
                     chatnum++;
+                    */
 
                     u.speechtherapygame_logon_told_choose_power = 0;
                 } else
