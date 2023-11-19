@@ -188,7 +188,7 @@ uchar mkflags; /* for monks */
     n = altn = 0;    /* no candidates found yet */
     eligible[0] = 0; /* lint suppression */
     /* gather eligible artifacts */
-    for (m = 1, a = &artilist[m]; a->otyp; a++, m++) 
+    for (m = 1, a = &artilist[m]; a->otyp; a++, m++)
     {
         if (artiexist[m])
             continue;
@@ -225,12 +225,12 @@ uchar mkflags; /* for monks */
             }
 
             /* found something to consider for random selection */
-            if (a->alignment != A_NONE || u.ugifts > 0) 
+            if (a->alignment != A_NONE || u.ugifts > 0)
             {
                 /* right alignment, or non-aligned with at least 1
                    previous gift bestowed, makes this one viable */
                 eligible[n++] = m;
-            } 
+            }
             else
             {
                 /* non-aligned with no previous gifts;
@@ -250,7 +250,7 @@ uchar mkflags; /* for monks */
     if (!n)
         n = altn;
 
-    if (n) 
+    if (n)
     {
         /* found at least one candidate; pick one at random */
         m = eligible[rn2(n)]; /* [0..n-1] */
@@ -260,7 +260,7 @@ uchar mkflags; /* for monks */
         if (by_align || !otmp)
             otmp = mksobj_with_flags((int) a->otyp, TRUE, FALSE, FALSE, (struct monst*)0, MAT_NONE, 0UL, 0UL, MKOBJ_FLAGS_FORCE_BASE_MATERIAL);
 
-        if (otmp) 
+        if (otmp)
         {
             otmp = oname(otmp, a->name);
             otmp->oartifact = m;
@@ -273,8 +273,8 @@ uchar mkflags; /* for monks */
             else
                 otmp->material = objects[otmp->otyp].oc_material; /* Only the base material will do */
         }
-    } 
-    else 
+    }
+    else
     {
         /* nothing appropriate could be found; return original object */
         if (by_align)
@@ -339,7 +339,7 @@ boolean mod;
 
     if (otmp && *name)
         for (a = artilist + 1; a->otyp; a++)
-            if (a->otyp == otmp->otyp && !strcmp(a->name, name)) 
+            if (a->otyp == otmp->otyp && !strcmp(a->name, name))
             {
                 register int m = (int) (a - artilist);
                 otmp->oartifact = (char) (mod ? m : 0);
@@ -479,7 +479,7 @@ struct obj *uitem;
     boolean luck = has_obj_mythic_luck(uitem) || (
         ((objects[otyp].oc_pflags & P1_CONFERS_LUCK) && !((objects[otyp].oc_pflags & P1_LUCK_APPLIES_TO_INAPPROPRIATE_CHARACTERS_ONLY) && inappr))
         || (
-                (objects[otyp].oc_pflags & P1_CONFERS_UNLUCK) && 
+                (objects[otyp].oc_pflags & P1_CONFERS_UNLUCK) &&
                 (
                     ((objects[otyp].oc_pflags & P1_CURSED_ITEM_YIELDS_NEGATIVE) && uitem->cursed) || ((objects[otyp].oc_pflags & P1_LUCK_NEGATIVE_TO_INAPPROPRIATE_CHARACTERS) && inappr)
                 )
@@ -538,7 +538,7 @@ struct obj* uitem;
     boolean unluck = (
         ((objects[otyp].oc_pflags & P1_CONFERS_UNLUCK) && !((objects[otyp].oc_pflags & P1_LUCK_APPLIES_TO_INAPPROPRIATE_CHARACTERS_ONLY) && inappr))
             || (
-                     (objects[otyp].oc_pflags & P1_CONFERS_LUCK) && 
+                     (objects[otyp].oc_pflags & P1_CONFERS_LUCK) &&
                      (
                         ((objects[otyp].oc_pflags & P1_CURSED_ITEM_YIELDS_NEGATIVE) && uitem->cursed) || ((objects[otyp].oc_pflags & P1_LUCK_NEGATIVE_TO_INAPPROPRIATE_CHARACTERS) && inappr)
                      )
@@ -561,7 +561,7 @@ struct obj* uitem;
         return unluck_obtained;
     }
 
-    return FALSE; 
+    return FALSE;
 }
 
 /* obj is assumed to be carried */
@@ -743,10 +743,10 @@ long wp_mask;
 
     /* set monster type */
     if (spfx & SPFX_WARN_OF_MON) {
-        if (spec_m2(otmp)) 
+        if (spec_m2(otmp))
         {
             context.warntype.obj |= spec_m2(otmp);
-        } 
+        }
     }
 
 }
@@ -815,7 +815,7 @@ struct monst *mon;
 
     if (objects[obj->otyp].oc_flags4 & O4_DEALS_DAMAGE_TO_INAPPROPRIATE_CHARACTERS)
         badappropriate = inappropriate_monster_character_type(mon, obj);
-    
+
     if (obj->exceptionality >= EXCEPTIONALITY_CELESTIAL)
         badexceptional = inappropriate_exceptionality(mon, obj);
 
@@ -912,34 +912,34 @@ struct monst *mtmp;
     yours = (mtmp == &youmonst);
     ptr = mtmp->data;
 
-    if (weap->aflags & AF_DMONS) 
+    if (weap->aflags & AF_DMONS)
     {
         return (ptr == &mons[(int) weap->mtype]);
-    } 
-    else if (weap->aflags & AF_DCLAS) 
+    }
+    else if (weap->aflags & AF_DCLAS)
     {
         return (weap->mtype == (unsigned long) ptr->mlet);
-    } 
-    else if (weap->aflags & AF_DFLAG1) 
+    }
+    else if (weap->aflags & AF_DFLAG1)
     {
         return ((ptr->mflags1 & weap->mtype) != 0L);
-    } 
+    }
     else if (weap->aflags & AF_DFLAG2)
     {
         return ((ptr->mflags2 & weap->mtype)
                 || (yours
                     && ((!Upolyd && (urace.selfmask & weap->mtype))
                         || ((weap->mtype & M2_WERE) && u.ulycn >= LOW_PM))));
-    } 
-    else if (weap->aflags & AF_DALIGN) 
+    }
+    else if (weap->aflags & AF_DALIGN)
     {
         return yours ? (u.ualign.type != weap->alignment)
                      : (ptr->maligntyp == A_NONE
                         || sgn(ptr->maligntyp) != weap->alignment);
-    } 
+    }
     else
     {
-        switch (weap->attk.adtyp) 
+        switch (weap->attk.adtyp)
         {
         case AD_FIRE:
             return !(yours ? Fire_immunity : is_mon_immune_to_fire(mtmp));
@@ -1457,7 +1457,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         Strcpy(artifact_hit_desc, cxname(otmp));
 
     /* the four basic attacks: fire, cold, shock and missiles */
-    if (artifact_attack_type(AD_FIRE, otmp)) 
+    if (artifact_attack_type(AD_FIRE, otmp))
     {
         if (realizes_damage)
         {
@@ -1479,7 +1479,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             burn_away_slime();
         return realizes_damage;
     }
-    if (artifact_attack_type(AD_COLD, otmp)) 
+    if (artifact_attack_type(AD_COLD, otmp))
     {
         if (realizes_damage)
             pline_The_ex(ATR_NONE, HI_ICE, "%s %s %s%c", artifact_hit_desc,
@@ -1519,13 +1519,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         return realizes_damage;
     }
 
-    if (artifact_attack_type(AD_STUN, otmp) && dieroll <= MB_MAX_DIEROLL) 
+    if (artifact_attack_type(AD_STUN, otmp) && dieroll <= MB_MAX_DIEROLL)
     {
         /* Magicbane's special attacks (possibly modifies hittee[]) */
         return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
     }
 
-    if (!spec_dbon_applies) 
+    if (!spec_dbon_applies)
     {
         /* since damage bonus didn't apply, nothing more to do;
            no further attacks have side-effects on inventory */
@@ -1540,7 +1540,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         {
             strcpy(wepdesc, The(artifact_hit_desc));
             /* not really beheading, but close */
-            if (youattack && u.uswallow && mdef == u.ustuck) 
+            if (youattack && u.uswallow && mdef == u.ustuck)
             {
                 You_ex(ATR_NONE, CLR_MSG_MYSTICAL, "slice %s wide open!", mon_nam(mdef));
                 //*dmgptr = 2 * (double)mdef->mhp + FATAL_DAMAGE_MODIFIER;
@@ -1548,13 +1548,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 *instakillptr = TRUE;
                 return 2;
             }
-            if (!youdefend) 
+            if (!youdefend)
             {
                 /* allow normal cutworm() call to add extra damage */
                 if (notonhead)
                     return FALSE;
 
-                if (bigmonst(mdef->data)) 
+                if (bigmonst(mdef->data))
                 {
                     if (youattack)
                         You_ex(ATR_NONE, CLR_MSG_MYSTICAL, "slice deeply into %s!", mon_nam(mdef));
@@ -1570,7 +1570,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 pline_ex(ATR_NONE, CLR_MSG_MYSTICAL, "%s cuts %s in half!", wepdesc, mon_nam(mdef));
                 otmp->dknown = TRUE;
                 return 2;
-            } 
+            }
             else
             {
                 if (bigmonst(youmonst.data))
@@ -1596,9 +1596,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 otmp->dknown = TRUE;
                 return 2;
             }
-        } 
+        }
         else if (artifact_has_flag(otmp, AF_BEHEAD)
-                   && (dieroll == 1 || has_vorpal_vulnerability(mdef->data))) 
+                   && (dieroll == 1 || has_vorpal_vulnerability(mdef->data)))
         {
             static const char *const behead_msg[2] = { "%s beheads %s!",
                                                        "%s decapitates %s!" };
@@ -1782,7 +1782,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 }
 
 /* Function used when someone attacks someone else with an artifact-like
- * weapon.  
+ * weapon.
  * Returns extra damage caused, to be added to damage caused by caller (so it can be displayed correctly), if any caused; -1 means that the caller has to kill mdef
  */
 int
@@ -1823,7 +1823,7 @@ short* adtyp_ptr; /* return value is the type of damage caused */
      * handled.  Messages are done in this function, however.
      */
 
-    if (youattack && youdefend) 
+    if (youattack && youdefend)
     {
         impossible("attacking yourself with weapon?");
         return 0;
@@ -2613,7 +2613,7 @@ struct obj *obj;
 
 
     check_arti_name_discovery(obj);
-    
+
     if (oart->aflags & AF_INVOKE_EXPENDS_CHARGE)
     {
         consume_obj_charge(obj, TRUE);
@@ -2636,7 +2636,7 @@ struct obj *obj;
 
     if (oart->inv_prop > LAST_PROP)
     {
-        switch (oart->inv_prop) 
+        switch (oart->inv_prop)
         {
         case ARTINVOKE_TAMING:
         {
@@ -2682,7 +2682,7 @@ struct obj *obj;
             context.botl = TRUE;
             break;
         }
-        case ARTINVOKE_ENERGY_BOOST: 
+        case ARTINVOKE_ENERGY_BOOST:
         {
             int epboost = (u.uenmax + 1 - u.uen) / 2;
 
@@ -2712,7 +2712,7 @@ struct obj *obj;
                 goto nothing_special;
             break;
         }
-        case ARTINVOKE_UNTRAP: 
+        case ARTINVOKE_UNTRAP:
         {
             if (!untrap(TRUE)) {
                 obj->repowerleft = 0;
@@ -2814,12 +2814,12 @@ struct obj *obj;
             pseudo.quan = 1L; /* do not let useup get it */
             double damage = 0;
 
-            if (!getdir((char*)0)) 
+            if (!getdir((char*)0))
             {
                 pline1(Never_mind);
                 return 0;
             }
-            if (!u.dx && !u.dy && !u.dz) 
+            if (!u.dx && !u.dy && !u.dz)
             {
                 play_simple_object_sound(obj, OBJECT_SOUND_TYPE_INVOKE);
                 if ((damage = zapyourself(&pseudo, TRUE)) > 0)
@@ -2845,7 +2845,7 @@ struct obj *obj;
                 cnt++;
             }
             int selected_item = 0;
-            
+
             if (cnt == 0)
             {
                 pline("Nothing seems to happen.");
@@ -3005,7 +3005,7 @@ struct obj *obj;
             // Clamp the limits to the range 0..100.
             // u.speechTherapyGame_challenge_upper_limit = min(max(u.speechTherapyGame_challenge_upper_limit, 100),0);
 
-        	// This system was conceived of as a tool for therapists to prepare speech targets for, in which they would know their individual client's capabilities and assign difficulties to the targets. However, in the user testing for this project, we cannot know the strengths and weaknesses of each test participant ahead of time, so we give every speech challenge an equal probability of being picked. 
+        	// This system was conceived of as a tool for therapists to prepare speech targets for, in which they would know their individual client's capabilities and assign difficulties to the targets. However, in the user testing for this project, we cannot know the strengths and weaknesses of each test participant ahead of time, so we give every speech challenge an equal probability of being picked.
 
             int challenge_difficulty = -1; // Tell AAA to serve us a random difficulty by asking for -1. To ask for a specific difficulty, you would use a positive integer, and the difficulty closest to that integer would be served to the player.
 
@@ -3021,7 +3021,7 @@ struct obj *obj;
             }
 			*/
 
-			if (challenge_result == -1) 
+			if (challenge_result == -1)
 			{
                 // Exception handling is done within the challengePlayer function, so we can just exit.
                 break;
@@ -3037,20 +3037,20 @@ struct obj *obj;
 			   If the player is getting generally poor scores (ie. their moving average is low) then we reward their improvements a lot more than if they get consistently high scores. I think this is necessary to motivate people who are really struggling: we want any small victory they get to feel huge.
 			 */
 
-        	// Update the weighted moving average to reflect the latest data point.
-            u.speechTherapyGame_weighted_average_challenge_result = (u.speechTherapyGame_weighted_average_challenge_result * (1 - speechTherapyGame_weighted_average_alpha)) + (challenge_result * speechTherapyGame_weighted_average_alpha);
-
             // How much did the player's latest result improve on their moving average?
             float improvement = max(challenge_result - u.speechTherapyGame_weighted_average_challenge_result, 0);
 
             // If the player is getting generally poor scores (ie. their moving average is low) then we reward their improvements a lot more than if they get consistently high scores. I think this is necessary to motivate people who are really struggling: we want any small victory they get to feel huge.
-        	float improvement_exponent = (100 - u.speechTherapyGame_weighted_average_challenge_result) / 100;
+        	  float improvement_exponent = (100 - u.speechTherapyGame_weighted_average_challenge_result) / 100;
 
-            // We award some extra bonus points which scale logarithmically with the magnitude of the improvement, so big improvements don't receive excessive bonuses. As the player's average score improves, the logarithmic scaling becomes more punishing, so smaller bonuses are rewarded if the player is already doing well. 
+            // Update the weighted moving average to reflect the latest data point.
+            u.speechTherapyGame_weighted_average_challenge_result = (u.speechTherapyGame_weighted_average_challenge_result * (1 - speechTherapyGame_weighted_average_alpha)) + (challenge_result * speechTherapyGame_weighted_average_alpha);
+
+            // We award some extra bonus points which scale logarithmically with the magnitude of the improvement, so big improvements don't receive excessive bonuses. As the player's average score improves, the logarithmic scaling becomes more punishing, so smaller bonuses are rewarded if the player is already doing well.
             int player_score = min(floor(challenge_result + pow(improvement, improvement_exponent)), 100);
 
             // We also have an accumulated comeback-bonus score that increases every consecutive time the player gets a really bad score, then when the player gets a score that's good enough for a reward, this comeback bonus is added onto to make it a much bigger reward, and the comeback bonus resets to zero.
-            if (challenge_result < challenge_threshold_adequate)
+            if (player_score < challenge_threshold_adequate)
             {
                 u.speechTherapyGame_comeback_bonus = challenge_result + (u.speechTherapyGame_comeback_bonus * 1.1) + 10;
             } else
@@ -3060,7 +3060,7 @@ struct obj *obj;
                 pline_ex1(ATR_NONE, CLR_MSG_MYSTICAL, "Comeback bonus!");
             }
 
-            // The player's moving average score, and thus the amount of score bonuses they get, are tied to their save file. The moving average for a new game begins at zero so that the player is rewarded a lot for early successes, which helps with early player retention into the system. 
+            // The player's moving average score, and thus the amount of score bonuses they get, are tied to their save file. The moving average for a new game begins at zero so that the player is rewarded a lot for early successes, which helps with early player retention into the system.
 
             if (challenge_result >= challenge_threshold_perfect)
                 pline_ex1(ATR_NONE, CLR_MSG_POSITIVE, "PERFECT PRONUNCIATION! Exceptionally well done!");
@@ -3090,7 +3090,7 @@ struct obj *obj;
 				 *    Excellent = Mass Dominate Monster Spell effect (area, permanent)
 				 */
                 Your("voice reaches out, carrying your power...");
-                
+
                 if (player_score >= challenge_threshold_perfect)
                 {
                     struct obj pseudo;
@@ -3158,7 +3158,7 @@ struct obj *obj;
                     You("may choose any form up to level %d", (int)floor(speechtherapygame_get_polylevel()));
                 polyself(0); // An argument of 0 limits polymorph forms by player level. An arg of 1 makes any form legal.
                 speechtherapygame_set_polylevel(0);
-                
+
                 HPolymorph_control = HPolymorph_control_previous;
                 }
                 else
@@ -3201,8 +3201,8 @@ struct obj *obj;
         }
 
         } /* switch */
-    } 
-    else 
+    }
+    else
     {
         boolean switch_on = (obj->invokeon == FALSE); // (u.uprops[oart->inv_prop].extrinsic& W_ARTIFACT_INVOKED) == 0;
         boolean noeff = temporary_effect ? (u.uprops[oart->inv_prop].extrinsic || u.uprops[oart->inv_prop].intrinsic) : ((u.uprops[oart->inv_prop].extrinsic & ~W_ARTIFACT_INVOKED) || u.uprops[oart->inv_prop].intrinsic);
@@ -3328,7 +3328,7 @@ create_portal()
     start_menu_ex(tmpwin, GHMENU_STYLE_CHOOSE_SIMPLE);
 
     /* use index+1 (cant use 0) as identifier */
-    for (i = num_ok_dungeons = 0; i < n_dgns; i++) 
+    for (i = num_ok_dungeons = 0; i < n_dgns; i++)
     {
         if (!dungeons[i].dunlev_ureached)
             continue;
@@ -3338,11 +3338,11 @@ create_portal()
         num_ok_dungeons++;
         last_ok_dungeon = i;
     }
-    
+
     end_menu(tmpwin, "Open a portal to which dungeon?");
 
 
-    if (num_ok_dungeons > 1) 
+    if (num_ok_dungeons > 1)
     {
         /* more than one entry; display menu for choices */
         menu_item* selected;
@@ -3380,7 +3380,7 @@ create_portal()
         play_sfx_sound(SFX_DISORIENTED_FOR_MOMENT);
         You_feel_ex(ATR_NONE, CLR_MSG_ATTENTION, "very disoriented for a moment.");
     }
-    else 
+    else
     {
         play_sfx_sound(SFX_LEVEL_TELEPORT);
         if (!Blind)
@@ -3613,7 +3613,7 @@ int prop_index;
 
     wornbits = u.uprops[prop_index].extrinsic;
 
-    for (obj = invent; obj; obj = obj->nobj) 
+    for (obj = invent; obj; obj = obj->nobj)
     {
         if ((wornbits & W_ARTIFACT_CARRIED) && obj->oartifact && (artilist[obj->oartifact].carried_prop == prop_index || (artilist[obj->oartifact].cspfx & spfx)))
             return obj;
@@ -3899,7 +3899,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
 {
     if (!objp || !*objp)
         return 0;
-    
+
     struct obj *obj = *objp;
 
     if (touch_artifact(obj, &youmonst)) {
@@ -4174,7 +4174,7 @@ struct monst *mon; /* if null, hero assumed */
         mon = &youmonst;
 
     for (o = ((mon == &youmonst) ? invent : mon->minvent); o;
-         o = nxtobj(o, key, FALSE)) 
+         o = nxtobj(o, key, FALSE))
     {
         if (is_magic_key(mon, o))
             return o;
